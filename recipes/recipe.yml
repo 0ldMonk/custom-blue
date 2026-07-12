@@ -62,9 +62,11 @@ modules:
       keys:
         - "https://pkgs.tailscale.com/stable/fedora/repo.gpg"
         - "https://repo.vscodium.dev/vscodium.gpg"
+        - "https://packages.mozilla.org/rpm/firefox/signing-key.gpg"
       files:
         - "https://pkgs.tailscale.com/stable/fedora/tailscale.repo"
         - "https://repo.vscodium.dev/vscodium.repo"
+        - "mozilla-firefox.repo" # local file: files/dnf/mozilla-firefox.repo
       nonfree: rpmfusion
       copr:
         - atim/starship
@@ -92,12 +94,9 @@ modules:
         - s-tui
         - tailscale # make sure repo is added above
         - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
+        - firefox # from Mozilla's own repo, not Fedora's (always current)
     remove:
       packages:
-        # example: removing firefox (in favor of the flatpak)
-        # "firefox" is the main package, "firefox-langpacks" is a dependency
-        - firefox
-        - firefox-langpacks # also remove firefox dependency (not required for all packages, this is a special case)
         - tuned-ppd
 
   - type: default-flatpaks
