@@ -58,6 +58,17 @@ modules:
       - 10046 # Custom Touchpad Gestures
 
   - type: dnf
+    # clean removal first, in its own transaction, so nothing is trying to
+    # install/keep firefox while this removes it and its exact-version-pinned
+    # langpacks dependency
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+        - tuned-ppd
+        - tuned # using power-profiles-daemon instead
+
+  - type: dnf
     repos:
       keys:
         - "https://pkgs.tailscale.com/stable/fedora/repo.gpg"
@@ -94,11 +105,9 @@ modules:
         - s-tui
         - tailscale # make sure repo is added above
         - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
-        - firefox # from Mozilla's own repo, not Fedora's (always current)
-    remove:
-      packages:
-        - tuned-ppd
-        - tuned # using power-profiles-daemon instead
+        - repo: mozilla-firefox # explicitly source from Mozilla, not Fedora
+          packages:
+            - firefox
 
   - type: default-flatpaks
     configurations:
