@@ -40,12 +40,13 @@ modules:
     repos:
       keys:
         - "https://pkgs.tailscale.com/stable/fedora/repo.gpg"
+        - "https://repo.vscodium.dev/vscodium.gpg"
       files:
         - "https://pkgs.tailscale.com/stable/fedora/tailscale.repo"
+        - "https://repo.vscodium.dev/vscodium.repo"
       nonfree: rpmfusion
       copr:
         - atim/starship
-        - binlab/vscode
         - bieszczaders/kernel-cachyos-addons
         - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
     install:
@@ -67,10 +68,9 @@ modules:
         - fzf
         - sysbench
         - tmux
-        - btop
         - s-tui
         - tailscale # make sure repo is added above
-        - vscode
+        - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
