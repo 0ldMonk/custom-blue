@@ -22,6 +22,27 @@ modules:
       - source: system
         destination: / # copies files/system/* (* means everything inside it) into your image's root folder /
 
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - JetBrainsMono
+
+  - type: kargs
+    kargs:
+      - quiet
+      - rw
+      # nvidia (hybrid AMD+nvidia laptop)
+      - rd.driver.blacklist=nouveau,nova_core
+      - modprobe.blacklist=nouveau,nova_core
+      - nvidia.NVreg_EnableS0ixPowerManagement=1
+      - nvidia.NVreg_DynamicPowerManagement=0x02
+      # boot/perf tuning
+      - rcutree.enable_rcu_lazy=1
+      - plymouth.use-simpledrm=1
+      - plymouth.enable=0
+      - amdgpu.seamless=1
+      - clearcpuid=rdseed
+
   - type: gnome-extensions
     install:
       - 1160  # Dash to Panel
