@@ -41,7 +41,7 @@ modules:
       copr:
         - atim/starship
         - bieszczaders/kernel-cachyos-addons
-        - itotm/cachyos-kernel-znver4
+        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
     install:
       packages:
         - micro
