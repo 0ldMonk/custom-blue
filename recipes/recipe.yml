@@ -45,6 +45,7 @@ modules:
       nonfree: rpmfusion
       copr:
         - atim/starship
+        - binlab/vscode
         - bieszczaders/kernel-cachyos-addons
         - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
     install:
@@ -69,6 +70,7 @@ modules:
         - btop
         - s-tui
         - tailscale # make sure repo is added above
+        - vscode
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
