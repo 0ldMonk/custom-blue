@@ -61,6 +61,13 @@ modules:
         - zsh
         - git
         - git-lfs
+        - btop
+        - zoxide
+        - fzf
+        - sysbench
+        - tmux
+        - btop
+        - s-tui
         - tailscale # make sure repo is added above
     remove:
       packages:
