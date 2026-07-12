@@ -98,6 +98,7 @@ modules:
     remove:
       packages:
         - tuned-ppd
+        - tuned # using power-profiles-daemon instead
 
   - type: default-flatpaks
     configurations:
