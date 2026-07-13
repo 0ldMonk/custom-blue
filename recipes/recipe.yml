@@ -12,10 +12,12 @@ image-version: latest # latest is also supported if you want new updates ASAP
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
-  - type: akmods
+# temporarily remove nvidia due to kernel 7.1 amdgpu bug (fixed in cachy kernel, not upstream yet).
+# for time being, we will overlay cachy kernel and use akmod-nvidia from rpmfusion
+#  - type: akmods
     # base: asus # if not specified, classic "main" base is used by default
-    install: []
-    nvidia-driver: nvidia-open
+#    install: []
+#    nvidia-driver: nvidia-open
 
   - type: files
     files:
