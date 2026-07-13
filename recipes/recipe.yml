@@ -14,6 +14,7 @@ image-version: latest # latest is also supported if you want new updates ASAP
 modules:
 # temporarily remove nvidia due to kernel 7.1 amdgpu bug (fixed in cachy kernel, not upstream yet).
 # for time being, we will overlay cachy kernel and use akmod-nvidia from rpmfusion
+# Remove after https://lore.kernel.org/stable/20260628140148.59923-1-admin@ptr1337.dev/ is released in fedora kernel
 #  - type: akmods
     # base: asus # if not specified, classic "main" base is used by default
 #    install: []
