@@ -42,11 +42,6 @@ jobs:
           # enabled by default, disable if your image is small and you want faster builds
           maximize_build_space: true
 
-          # rechunk the image into granular, stable layers so devices download
-          # only changed chunks on update (smaller/resumable updates). costs
-          # build time + space, which don't matter on a GitHub runner.
-          rechunk: true
-
           # reuse registry layer cache to speed up builds, but only on git push
           # / PR (fast recipe iteration). the daily scheduled run AND the manual
           # "Run workflow" button both bypass cache for a full fresh rebuild
