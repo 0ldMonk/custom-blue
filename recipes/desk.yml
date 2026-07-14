@@ -11,6 +11,12 @@ image-version: latest # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 modules:
+  # nvidia GPU (driver + nova_core karg) — desktop only.
+  # MUST run first, against the pristine base image: the akmods nvidia install
+  # pulls 32-bit (i686) mesa, and if a prior dnf module (rpmfusion/firefox) has
+  # already bumped the x86_64 mesa stack, the lagging i686 mesa conflicts.
+  - from-file: modules/nvidia.yml
+
   # everything shared across machines
   - from-file: modules/common-files.yml
   - from-file: modules/common-fonts.yml
@@ -20,9 +26,6 @@ modules:
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
   - type: signing # sets up the policy & signing files for signed images to work fully
-
-  # nvidia GPU (driver + nova_core karg) — desktop only
-  - from-file: modules/nvidia.yml
 
   # ============================================================
   # machine-specific: desktop
