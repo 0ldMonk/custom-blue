@@ -1,0 +1,39 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# shared flatpak set, pulled in via `from-file:` from recipes that want the
+# same base flatpaks (proart.yml, desk-nvidia.yml, ...)
+type: default-flatpaks
+configurations:
+  - notify: true # Send notification after install/uninstall is finished (true/false)
+    scope: system
+    # If no repo information is specified, Flathub will be used by default
+    install: # system flatpaks we want all users to have and not remove
+      - be.alexandervanhee.gradia
+      - com.github.PintaProject.Pinta
+      - com.github.tchx84.Flatseal
+      - com.google.Chrome
+      - com.mattjakeman.ExtensionManager
+      - com.moonlight_stream.Moonlight
+      - com.ranfdev.DistroShelf
+      - com.sublimehq.SublimeText
+      - dev.deedles.Trayscale
+      - net.cozic.joplin_desktop
+      - net.nokyan.Resources
+      - org.gnome.Calculator
+      - org.gnome.Calendar
+      - org.gnome.Characters
+      - org.gnome.clocks
+      - org.gnome.Connections
+      - org.gnome.Extensions
+      - org.gnome.FileRoller
+      - org.gnome.Firmware
+      - org.gnome.font-viewer
+      - org.gnome.Logs
+      - org.gnome.Loupe
+      - org.gnome.NautilusPreviewer
+      - org.gnome.Papers
+      - org.gnome.SimpleScan
+      - org.gnome.Snapshot
+      - org.gnome.Weather
+      - page.tesk.Refine
+  - scope: user # Also add Flathub user repo, but no user packages

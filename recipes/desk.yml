@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# image will be published to ghcr.io/<user>/<name>
+name: monk-blue-desktop
+# description will be included in the image's metadata
+description: This is my personal OS image (desktop, nvidia).
+
+# the base image to build on top of (FROM) and the version tag to use
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: latest # latest is also supported if you want new updates ASAP
+
+# module configuration, executed in order
+modules:
+  # everything shared across machines
+  - from-file: modules/common-files.yml
+  - from-file: modules/common-fonts.yml
+  - from-file: modules/common-kargs.yml
+  - from-file: modules/common-gnome-extensions.yml
+  - from-file: modules/common-packages.yml
+  - from-file: modules/common-firefox.yml
+  - from-file: modules/common-flatpaks.yml
+  - type: signing # sets up the policy & signing files for signed images to work fully
+
+  # nvidia GPU (driver + nova_core karg) — desktop only
+  - from-file: modules/nvidia.yml
+
+  # ============================================================
+  # machine-specific: desktop
+  # ============================================================
+  # add desktop-only kernel args here (kargs module errors on an empty list, so
+  # this stays commented until there's something to add):
+  # - type: kargs
+  #   kargs:
+  #     - some.karg=1
+
+  - type: dnf
+    install:
+      packages: [] # add desktop-only packages here
+
+  - type: default-flatpaks
+    configurations:
+      - scope: system
+        install: [] # add desktop-only flatpaks here
