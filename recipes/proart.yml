@@ -19,6 +19,7 @@ modules:
   - from-file: modules/common-packages.yml
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
+  - from-file: modules/common-brew.yml
   - type: signing # sets up the policy & signing files for signed images to work fully
 
   # ============================================================
