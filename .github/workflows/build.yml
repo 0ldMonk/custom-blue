@@ -41,10 +41,3 @@ jobs:
 
           # enabled by default, disable if your image is small and you want faster builds
           maximize_build_space: true
-
-          # reuse registry layer cache to speed up builds, but only on git push
-          # / PR (fast recipe iteration). the daily scheduled run AND the manual
-          # "Run workflow" button both bypass cache for a full fresh rebuild
-          # (always-current packages) — use the button when you want a forced
-          # fresh manual build.
-          use_cache: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
