@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# copies files/system/* into the image root (/), for ALL machines.
+# machine-specific files live in their own source dir (e.g. files/proart/) and
+# are copied by a files module in that recipe.
+type: files
+files:
+  - source: system
+    destination: / # copies files/system/* (* means everything inside it) into your image's root folder /

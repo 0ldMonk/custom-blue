@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# shared dnf repos + packages for ALL machines, pulled in via `from-file:`.
+# firefox handling lives in common-firefox.yml.
+# machine-specific packages (e.g. laptop pam) live in the recipe itself.
+type: dnf
+repos:
+  keys:
+    - "https://pkgs.tailscale.com/stable/fedora/repo.gpg"
+    - "https://repo.vscodium.dev/vscodium.gpg"
+  files:
+    - "https://pkgs.tailscale.com/stable/fedora/tailscale.repo"
+    - "https://repo.vscodium.dev/vscodium.repo"
+  nonfree: rpmfusion
+  copr:
+    - atim/starship
+install:
+  packages:
+    - micro
+    - starship
+    - powertop
+    - zsh
+    - git
+    - git-lfs
+    - btop
+    - zoxide
+    - fzf
+    - sysbench
+    - tmux
+    - s-tui
+    - tailscale # make sure repo is added above
+    - codium # VSCodium: open-source VS Code build, no MS branding/telemetry

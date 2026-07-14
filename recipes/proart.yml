@@ -1,0 +1,64 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# image will be published to ghcr.io/<user>/<name>
+name: monk-blue
+# description will be included in the image's metadata
+description: This is my personal OS image (ASUS ProArt PX13 laptop).
+
+# the base image to build on top of (FROM) and the version tag to use
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: latest # latest is also supported if you want new updates ASAP
+
+# module configuration, executed in order
+modules:
+  # everything shared across machines
+  - from-file: modules/common-files.yml
+  - from-file: modules/common-fonts.yml
+  - from-file: modules/common-kargs.yml
+  - from-file: modules/common-gnome-extensions.yml
+  - from-file: modules/common-packages.yml
+  - from-file: modules/common-firefox.yml
+  - from-file: modules/common-flatpaks.yml
+  - type: signing # sets up the policy & signing files for signed images to work fully
+
+  # ============================================================
+  # machine-specific: ASUS ProArt PX13 laptop
+  # ============================================================
+  # nvidia is intentionally NOT baked in here (unlike desk.yml). kernel 7.1 has
+  # an amdgpu bug (fixed in the cachy kernel, not upstream yet) so for now we
+  # overlay the cachy kernel + akmod-nvidia + nvidia kargs LIVE on the booted
+  # system instead. re-add `- from-file: modules/nvidia.yml` once fixed upstream:
+  # https://lore.kernel.org/stable/20260628140148.59923-1-admin@ptr1337.dev/
+
+  # laptop-only files (e.g. /etc/environment hybrid AMD+nvidia GPU workarounds:
+  # GSK_RENDERER=gl, EGL vendor pin) — copies files/proart/* into /
+  - type: files
+    files:
+      - source: proart
+        destination: /
+
+  - type: kargs
+    kargs:
+      - rcutree.enable_rcu_lazy=1
+      - clearcpuid=rdseed # Strix Point rdseed erratum workaround (laptop CPU)
+
+  - type: dnf
+    repos:
+      copr:
+        - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
+        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
+    remove:
+      packages:
+        - tuned-ppd
+        - tuned # using power-profiles-daemon instead
+    install:
+      packages:
+        - ananicy-cpp
+        - power-profiles-daemon
+        - pam-u2f
+        - pamu2fcfg
+
+  - type: default-flatpaks
+    configurations:
+      - scope: system
+        install: [] # add laptop-only flatpaks here

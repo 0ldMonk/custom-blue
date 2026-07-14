@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# gnome shell extensions for ALL machines. move machine-specific ones (e.g.
+# Custom Touchpad Gestures on the laptop) to the recipe later if needed.
+type: gnome-extensions
+install:
+  - 1160  # Dash to Panel
+  - 2932  # Executor
+  - 4839  # Clipboard History
+  - 517   # Caffeine
+  - 2236  # Night Theme Switcher
+  - 615   # AppIndicator and KStatusNotifierItem Support
+  - 9875  # O-tiling
+  - 4998  # Legacy (GTK3) Theme Scheme Auto Switcher
+  - 1401  # Bluetooth Quick Connect
+  - 3193  # Blur my Shell
+  - 10046 # Custom Touchpad Gestures
