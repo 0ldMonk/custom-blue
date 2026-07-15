@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: monk-blue-vm
+description: This is my personal OS image (headless Proxmox VM).
+
+base-image: quay.io/fedora/fedora-bootc
+image-version: "44"
+
+modules:
+  - from-file: modules/common-files.yml
+
+  # NOT common-packages.yml — that has desktop-only packages (gnome-tweaks,
+  # codium) that don't belong on a headless VM
+  - from-file: modules/common-cli.yml
+
+  - type: dnf
+    install:
+      packages:
+        - podman
+        - cloud-init # consumes Proxmox's Cloud-Init drive: network, hostname,
+                      # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
+        - qemu-guest-agent
+        - node-exporter # binary only; config/enablement stays in Ansible
+
+  - type: kargs
+    kargs:
+      - console=ttyS0 # serial console, for Proxmox's noVNC/xterm.js console
+
+  # the pi USER ITSELF and its SSH key are deliberately NOT baked here — both
+  # come from Proxmox's Cloud-Init (ciuser=pi + SSH public key set per
+  # VM/template), so no key or user-creation logic is committed to this repo.
+  - type: files
+    files:
+      - source: vm
+        destination: /
+
+  # git doesn't preserve arbitrary file modes, and the files module's plain
+  # `cp` doesn't either — so /etc/sudoers.d/pi lands at a mode sudo rejects
+  # (sudo requires exactly 0440; 0644 is explicitly refused).
+  - type: script
+    snippets:
+      - "chmod 0440 /etc/sudoers.d/pi"
+
+  - type: signing
