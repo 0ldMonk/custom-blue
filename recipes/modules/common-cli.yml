@@ -31,4 +31,5 @@ modules:
   - type: script
     snippets:
       - "sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd"
-      - "chsh -s /usr/bin/zsh root"
+      - "usermod --shell /usr/bin/zsh root" # chsh (util-linux) is missing from
+                                             # the base image; usermod (shadow-utils) does the same job
