@@ -17,6 +17,8 @@ modules:
     install:
       packages:
         - podman
+        - podman-compose # runs existing docker-compose.yml files as-is
+                          # (e.g. portainer); deployment itself stays in Ansible
         - cloud-init # consumes Proxmox's Cloud-Init drive: network, hostname,
                       # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
         - qemu-guest-agent
