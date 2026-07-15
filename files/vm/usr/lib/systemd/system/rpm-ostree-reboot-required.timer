@@ -1,0 +1,10 @@
+[Unit]
+Description=Periodically check whether rpm-ostree has a deployment staged for reboot
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=rpm-ostree-reboot-required.service
+
+[Install]
+WantedBy=timers.target

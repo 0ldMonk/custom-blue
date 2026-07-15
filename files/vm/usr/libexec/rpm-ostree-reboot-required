@@ -1,0 +1,21 @@
+#!/bin/bash
+# Writes node_reboot_required for node_exporter's textfile collector by
+# checking whether rpm-ostree has a deployment staged (pulled but not yet
+# booted into) -- the ostree/bootc equivalent of Debian's /run/reboot-required.
+set -euo pipefail
+
+metrics_dir=/var/lib/prometheus/node-exporter
+out="$metrics_dir/rpm_ostree_reboot_required.prom"
+tmp="$(mktemp "$metrics_dir/.rpm_ostree_reboot_required.XXXXXX")"
+trap 'rm -f "$tmp"' EXIT
+
+staged=$(rpm-ostree status --json | jq '[.deployments[].staged] | any')
+
+cat > "$tmp" <<EOF
+# HELP node_reboot_required Whether rpm-ostree has staged a deployment that needs a reboot to apply.
+# TYPE node_reboot_required gauge
+node_reboot_required $([ "$staged" = "true" ] && echo 1 || echo 0)
+EOF
+
+mv "$tmp" "$out"
+trap - EXIT

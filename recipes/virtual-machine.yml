@@ -22,7 +22,7 @@ modules:
         - cloud-init # consumes Proxmox's Cloud-Init drive: network, hostname,
                       # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
         - qemu-guest-agent
-        - node-exporter # binary only; config/enablement stays in Ansible
+        - node-exporter
 
   - type: kargs
     kargs:
@@ -38,9 +38,21 @@ modules:
 
   # git doesn't preserve arbitrary file modes, and the files module's plain
   # `cp` doesn't either — so /etc/sudoers.d/pi lands at a mode sudo rejects
-  # (sudo requires exactly 0440; 0644 is explicitly refused).
+  # (sudo requires exactly 0440; 0644 is explicitly refused), and the
+  # reboot-required script needs its executable bit set explicitly too.
   - type: script
     snippets:
       - "chmod 0440 /etc/sudoers.d/pi"
+      - "chmod 0755 /usr/libexec/rpm-ostree-reboot-required"
+
+  # node-exporter and the reboot-required timer both auto-start on boot here
+  # (unlike node-exporter's package-only precedent elsewhere) since the
+  # reboot-required metric this VM cares about is meaningless without the
+  # exporter actually running, and there's no separate Ansible step for it.
+  - type: systemd
+    system:
+      enabled:
+        - node_exporter.service
+        - rpm-ostree-reboot-required.timer
 
   - type: signing

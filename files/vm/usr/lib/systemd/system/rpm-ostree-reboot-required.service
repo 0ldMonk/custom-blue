@@ -1,0 +1,6 @@
+[Unit]
+Description=Check whether rpm-ostree has a deployment staged for reboot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/rpm-ostree-reboot-required
