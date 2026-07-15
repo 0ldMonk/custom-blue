@@ -16,6 +16,7 @@ repos:
     - atim/starship
 install:
   packages:
+    - gnome-tweaks
     - micro
     - starship
     - powertop
