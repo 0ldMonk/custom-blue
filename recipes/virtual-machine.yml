@@ -16,9 +16,12 @@ modules:
   - type: dnf
     install:
       packages:
-        - podman
-        - podman-compose # runs existing docker-compose.yml files as-is
-                          # (e.g. portainer); deployment itself stays in Ansible
+      # docker and gang
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
         - cloud-init # consumes Proxmox's Cloud-Init drive: network, hostname,
                       # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
         - qemu-guest-agent
@@ -52,6 +55,7 @@ modules:
   - type: systemd
     system:
       enabled:
+        - docker.service
         - node_exporter.service
         - rpm-ostree-reboot-required.timer
         - rpm-ostreed-automatic.timer
