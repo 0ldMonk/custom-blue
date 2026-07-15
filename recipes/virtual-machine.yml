@@ -54,5 +54,6 @@ modules:
       enabled:
         - node_exporter.service
         - rpm-ostree-reboot-required.timer
+        - rpm-ostreed-automatic.timer
 
   - type: signing
