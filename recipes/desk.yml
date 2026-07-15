@@ -39,7 +39,8 @@ modules:
 
   - type: dnf
     install:
-      packages: [] # add desktop-only packages here
+      packages: 
+        - kitty
 
   - type: default-flatpaks
     configurations:
