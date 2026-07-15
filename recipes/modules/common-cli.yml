@@ -19,6 +19,7 @@ modules:
         - btop
         - zoxide
         - fzf
+        - jq
         - sysbench
         - tmux
         - tailscale
