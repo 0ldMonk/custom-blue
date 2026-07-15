@@ -6,7 +6,7 @@ name: monk-blue-desktop
 description: This is my personal OS image (desktop, nvidia).
 
 # the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/bluefin-dx-nvidia-open
+base-image: base-image: ghcr.io/ublue-os/silverblue-main
 image-version: latest # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
@@ -15,8 +15,7 @@ modules:
   # MUST run first, against the pristine base image: the akmods nvidia install
   # pulls 32-bit (i686) mesa, and if a prior dnf module (rpmfusion/firefox) has
   # already bumped the x86_64 mesa stack, the lagging i686 mesa conflicts.
- # not needed for bluefin-dx-nvidia image
- # - from-file: modules/nvidia.yml
+  - from-file: modules/nvidia.yml
 
   # everything shared across machines
   - from-file: modules/common-files.yml
