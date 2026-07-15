@@ -16,11 +16,19 @@ sudo podman run --rm -it --privileged --pull=newer \
   -v /var/lib/containers/storage:/var/lib/containers/storage \
   quay.io/centos-bootc/bootc-image-builder:latest \
   --type qcow2 \
+  --rootfs ext4 \
   ghcr.io/0ldmonk/monk-blue-vm:latest
 ```
 
 Output lands at `./output/qcow2/disk.qcow2`. The image is public, so no
 registry auth is needed.
+
+`--rootfs ext4` is explicit on purpose: `quay.io/fedora/fedora-bootc` doesn't
+declare a root filesystem type in its own image config, and
+`bootc-image-builder`'s undeclared fallback isn't reliably pinned down —
+rather than depend on that, force ext4 directly (confirmed as a real,
+supported flag in `bootc-image-builder`'s source,
+`bib/cmd/bootc-image-builder/main.go`).
 
 Note: `bootc-image-builder` has its own separate mechanism (a `config.toml`
 mounted at `/config.toml`) for baking in a default user at *this* step —
@@ -71,13 +79,25 @@ qm clone 9000 <newvmid> --name <hostname>
 Each clone can override `--ciuser` / `--sshkeys` / `--ipconfig0`
 independently in its own Cloud-Init tab.
 
-## 5. First-boot checklist
+## 5. Growing the disk
 
-- `qm resize <newvmid> scsi0 +20G` (or whatever) before first boot if you
-  need more than the built qcow2's default size, then confirm on first
-  login that the root filesystem actually grew (`df -h`) — not verified
-  whether this bootc image's partition layout auto-grows via cloud-init's
-  `growpart` module the same way a typical cloud image does.
+`bootc-image-builder` sizes the root filesystem at its configured minimum
+(or 2x the container image size, whichever is larger) — **not** whatever
+size you resize the Proxmox virtual disk to. The root volume is LVM
+(PV -> VG -> LV), and cloud-init's `growpart` module does not grow logical
+volumes, only partitions — so `qm resize` alone does not get you more
+usable space. Full chain, after `qm resize <vmid> scsi0 +20G`:
+
+```bash
+growpart /dev/sda 3          # grows the partition (cloud-init does this part automatically)
+pvresize /dev/sda3           # grow the LVM physical volume
+lvextend -l +100%FREE /dev/mapper/<vg>-root
+resize2fs /dev/mapper/<vg>-root   # ext4 -- see --rootfs ext4 above
+```
+
+Confirm with `df -h` after. Partition/VG names will vary — check with
+`lsblk` first.
+
 - `systemctl status qemu-guest-agent` should be active — this is what lets
   Proxmox report the VM's IP and do graceful shutdown/reboot from its UI.
 - Monitoring (`node-exporter`) is installed but not configured or enabled —
