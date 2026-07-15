@@ -33,3 +33,9 @@ modules:
       - "sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd"
       - "usermod --shell /usr/bin/zsh root" # chsh (util-linux) is missing from
                                              # the base image; usermod (shadow-utils) does the same job
+
+      # /etc/zshrc (shipped by the zsh package) is sourced by every interactive
+      # zsh shell regardless of whether a per-user ~/.zshrc exists, so this
+      # reaches root and any account created later (e.g. the VM's cloud-init
+      # pi user) without depending on /etc/skel or home-dir timing.
+      - "echo 'source /etc/zsh-extra.zsh' >> /etc/zshrc"
