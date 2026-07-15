@@ -26,6 +26,7 @@ modules:
                       # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
         - qemu-guest-agent
         - node-exporter
+        - cronie
 
   - type: kargs
     kargs:
