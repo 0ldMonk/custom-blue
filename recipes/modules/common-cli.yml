@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
+modules:
+  - type: dnf
+    repos:
+      keys:
+        - "https://pkgs.tailscale.com/stable/fedora/repo.gpg"
+      files:
+        - "https://pkgs.tailscale.com/stable/fedora/tailscale.repo"
+      copr:
+        - atim/starship
+    install:
+      packages:
+        - micro
+        - starship
+        - zsh
+        - git
+        - git-lfs
+        - btop
+        - zoxide
+        - fzf
+        - sysbench
+        - tmux
+        - tailscale
+
+  # ostree never overwrites already-existing local /etc content on upgrade,
+  # so this only affects NEW accounts (and root, which already exists in the
+  # base image) — not already-deployed proart/desk accounts, which were
+  # switched to zsh live via `chsh`.
+  - type: script
+    snippets:
+      - "sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd"
+      - "chsh -s /usr/bin/zsh root"
