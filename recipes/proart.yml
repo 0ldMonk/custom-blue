@@ -1,17 +1,12 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
 name: monk-blue-proart
-# description will be included in the image's metadata
 description: This is my personal OS image (ASUS ProArt PX13 laptop).
 
-# the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: latest # latest is also supported if you want new updates ASAP
+image-version: latest
 
-# module configuration, executed in order
 modules:
-  # everything shared across machines
   - from-file: modules/common-files.yml
   - from-file: modules/common-fonts.yml
   - from-file: modules/common-kargs.yml
@@ -20,19 +15,16 @@ modules:
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
   - from-file: modules/common-brew.yml
-  - type: signing # sets up the policy & signing files for signed images to work fully
+  - type: signing
 
-  # ============================================================
   # machine-specific: ASUS ProArt PX13 laptop
-  # ============================================================
   # nvidia is intentionally NOT baked in here (unlike desk.yml). kernel 7.1 has
   # an amdgpu bug (fixed in the cachy kernel, not upstream yet) so for now we
   # overlay the cachy kernel + akmod-nvidia + nvidia kargs LIVE on the booted
   # system instead. re-add `- from-file: modules/nvidia.yml` once fixed upstream:
   # https://lore.kernel.org/stable/20260628140148.59923-1-admin@ptr1337.dev/
 
-  # laptop-only files (e.g. /etc/environment hybrid AMD+nvidia GPU workarounds:
-  # GSK_RENDERER=gl, EGL vendor pin) — copies files/proart/* into /
+  # laptop-only files (/etc/environment hybrid AMD+nvidia GPU workarounds)
   - type: files
     files:
       - source: proart
@@ -62,4 +54,4 @@ modules:
   - type: default-flatpaks
     configurations:
       - scope: system
-        install: [] # add laptop-only flatpaks here
+        install: [] # laptop-only flatpaks

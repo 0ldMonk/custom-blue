@@ -1,11 +1,8 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# all firefox handling, pulled in via `from-file:`.
-# remove Fedora's firefox + langpacks first, then install Mozilla's own build
-# from their official repo. two separate dnf transactions because
-# firefox-langpacks hard-pins firefox's exact EVR, which the solver can't
-# satisfy if the removal and the differently-versioned Mozilla install are
-# resolved together.
+# two separate dnf transactions: firefox-langpacks hard-pins firefox's exact
+# EVR, which the solver can't satisfy if the removal and the
+# differently-versioned Mozilla install are resolved together.
 modules:
   - type: dnf
     remove:

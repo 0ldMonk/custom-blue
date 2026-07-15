@@ -1,16 +1,13 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# nvidia setup — included by machines with an nvidia GPU (desk.yml now; proart
-# will include it too once the laptop kernel bug is fixed).
-# installs the driver only (kmod + userspace libs, incl. the libcuda/libnvidia-ml
-# runtime driver API); this does NOT pull the CUDA toolkit (nvcc/cuda-runtime) —
+# installs the driver only (kmod + userspace libs, incl. libcuda/libnvidia-ml
+# runtime driver API) — does NOT pull the CUDA toolkit (nvcc/cuda-runtime);
 # add `cuda` packages explicitly if you need to build/run the full toolkit.
-# NOTE: the akmods module also auto-adds nouveau/modeset/simpledrm kargs; the
-# nouveau blacklist below is redundant with that but kept explicit so this file
-# fully describes the nvidia karg set.
+# the akmods module also auto-adds nouveau/modeset/simpledrm kargs; the
+# nouveau blacklist below is redundant with that but kept explicit so this
+# file fully describes the nvidia karg set.
 modules:
   - type: akmods
-    # base: asus # if not specified, classic "main" base is used by default
     install: []
     nvidia-driver: nvidia-open
   - type: kargs

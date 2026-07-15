@@ -1,7 +1,5 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# generic boot kargs for ALL machines. machine/CPU-specific kargs live in the
-# recipe (e.g. proart's clearcpuid); nvidia kargs live in nvidia.yml.
 type: kargs
 kargs:
   - quiet
