@@ -1,23 +1,17 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
 name: monk-blue-desktop
-# description will be included in the image's metadata
 description: This is my personal OS image (desktop, nvidia).
 
-# the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: latest # latest is also supported if you want new updates ASAP
+image-version: latest
 
-# module configuration, executed in order
 modules:
-  # nvidia GPU (driver + nova_core karg) — desktop only.
   # MUST run first, against the pristine base image: the akmods nvidia install
   # pulls 32-bit (i686) mesa, and if a prior dnf module (rpmfusion/firefox) has
   # already bumped the x86_64 mesa stack, the lagging i686 mesa conflicts.
   - from-file: modules/nvidia.yml
 
-  # everything shared across machines
   - from-file: modules/common-files.yml
   - from-file: modules/common-fonts.yml
   - from-file: modules/common-kargs.yml
@@ -26,23 +20,21 @@ modules:
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
   - from-file: modules/common-brew.yml
-  - type: signing # sets up the policy & signing files for signed images to work fully
+  - type: signing
 
-  # ============================================================
   # machine-specific: desktop
-  # ============================================================
-  # add desktop-only kernel args here (kargs module errors on an empty list, so
-  # this stays commented until there's something to add):
+  # kargs module errors on an empty list, so this stays commented until
+  # there's something to add:
   # - type: kargs
   #   kargs:
   #     - some.karg=1
 
   - type: dnf
     install:
-      packages: 
+      packages:
         - kitty
 
   - type: default-flatpaks
     configurations:
       - scope: system
-        install: [] # add desktop-only flatpaks here
+        install: [] # desktop-only flatpaks

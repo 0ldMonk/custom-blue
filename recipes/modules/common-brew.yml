@@ -1,11 +1,9 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# installs Homebrew (Linuxbrew) and sets up systemd timers that keep brew and
-# its installed packages auto-updated. shared by all machines.
 type: brew
-auto-update: true # update brew itself
+auto-update: true
 update-interval: "1d"
 update-wait-after-boot: "10m"
-auto-upgrade: true # upgrade installed brew packages
+auto-upgrade: true
 upgrade-interval: "1d"
-upgrade-wait-after-boot: "30m" # stagger after the update timer
+upgrade-wait-after-boot: "30m"

@@ -1,7 +1,5 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# gnome shell extensions for ALL machines. move machine-specific ones (e.g.
-# Custom Touchpad Gestures on the laptop) to the recipe later if needed.
 type: gnome-extensions
 install:
   - 1160  # Dash to Panel
