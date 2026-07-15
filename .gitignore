@@ -5,3 +5,4 @@ cosign.private
 *.iso-CHECKSUM
 .claude/
 docs/
+CLAUDE.md
