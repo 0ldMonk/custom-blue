@@ -62,5 +62,12 @@ modules:
         - node_exporter.service
         - rpm-ostree-reboot-required.timer
         - rpm-ostreed-automatic.timer
+      # bootc's own auto-updater: fetches AND applies/reboots on its own
+      # schedule, ignoring rpm-ostreed.conf's AutomaticUpdatePolicy=stage
+      # above. Masked (not just disabled) so it can't come back via a future
+      # preset/package update — updates here are stage-only, reboot is a
+      # separate, deliberate Ansible-driven step.
+      masked:
+        - bootc-fetch-apply-updates.timer
 
   - type: signing
