@@ -16,7 +16,6 @@ modules:
   - type: dnf
     install:
       packages:
-      # docker and gang
         - docker-ce
         - docker-ce-cli
         - containerd.io
@@ -28,6 +27,11 @@ modules:
         - node-exporter
         - cronie
         - wireguard-tools
+        - autofs
+        - moreutils
+        - nodejs
+        - borgbackup
+        - rclone
 
   - type: kargs
     kargs:
