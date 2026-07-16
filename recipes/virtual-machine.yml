@@ -27,6 +27,7 @@ modules:
         - qemu-guest-agent
         - node-exporter
         - cronie
+        - wireguard-tools
 
   - type: kargs
     kargs:
