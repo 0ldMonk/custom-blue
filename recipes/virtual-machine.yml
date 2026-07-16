@@ -32,7 +32,6 @@ modules:
         - nodejs
         - borgbackup
         - rclone
-        - ufw
 
   - type: kargs
     kargs:
