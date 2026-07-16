@@ -19,6 +19,7 @@ modules:
         - git
         - git-lfs
         - btop
+        - htop
         - zoxide
         - fzf
         - jq
