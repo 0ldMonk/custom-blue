@@ -27,6 +27,7 @@ modules:
         - tmux
         - tailscale
         - rsync
+        - traceroute
 
   # ostree never overwrites already-existing local /etc content on upgrade,
   # so this only affects NEW accounts (and root, which already exists in the
