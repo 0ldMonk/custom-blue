@@ -75,7 +75,6 @@ modules:
         - bootc-fetch-apply-updates.timer
 
   - type: dnf
-    optional: true
     remove:
       packages:
         - linux-firmware
