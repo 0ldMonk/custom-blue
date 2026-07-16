@@ -3,4 +3,7 @@ Description=Check whether rpm-ostree has a deployment staged for reboot
 
 [Service]
 Type=oneshot
+# prometheus user/group come from node-exporter's own sysusers.d drop-in
+User=prometheus
+Group=prometheus
 ExecStart=/usr/libexec/rpm-ostree-reboot-required
