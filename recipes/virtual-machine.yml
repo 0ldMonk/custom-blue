@@ -45,6 +45,12 @@ modules:
 
   - type: kargs
     kargs:
+      # both consoles registered so early boot output (incl. the dracut LUKS
+      # passphrase prompt) reaches either Proxmox console tab; a single
+      # console= only registers that one device, leaving the other blank.
+      # tty0 listed first, ttyS0 last so ttyS0 stays the primary /dev/console
+      # (unchanged from before).
+      - console=tty0
       - console=ttyS0 # serial console, for Proxmox's noVNC/xterm.js console
 
   # the pi USER ITSELF and its SSH key are deliberately NOT baked here — both
