@@ -5,7 +5,15 @@
 # all -- no bypass for an account that hasn't enrolled yet. enable-ssh-otp
 # warns about this and enrolls the invoking user in the same run.
 #auth       required     pam_google_authenticator.so
-auth       substack     password-auth
+# No `auth substack password-auth` here (unlike Fedora's stock file):
+# that substack ends in pam_unix.so, which would prompt for the real
+# Unix password over the same keyboard-interactive channel right after
+# OTP succeeds -- pam_google_authenticator.so is `required`, not the
+# last word, so PAM keeps walking the stack unless nothing follows it.
+# `PasswordAuthentication no` doesn't stop this: it only disables SSH's
+# separate `password` method, not a PAM-driven prompt reached via
+# keyboard-interactive. Identity is already proven by AuthenticationMethods
+# requiring publickey; keyboard-interactive here should mean OTP, full stop.
 auth       include      postlogin
 account    required     pam_sepermit.so
 account    required     pam_nologin.so
