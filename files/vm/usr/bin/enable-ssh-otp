@@ -1,0 +1,69 @@
+#!/bin/bash
+# Read-only helper: checks whether SSH OTP is already active and, if not,
+# prints the exact manual steps to enable it. Deliberately does NOT edit
+# any file itself. Both baked config files ship fully commented out;
+# turning OTP on for real is mandatory-with-no-fallback and can lock an
+# account out of SSH, so that edit is safer done by hand than by a script
+# pattern-matching text that could silently drift out of sync over time.
+set -euo pipefail
+
+PAM_FILE=/etc/pam.d/sshd
+SSHD_DROPIN=/etc/ssh/sshd_config.d/20-otp.conf
+
+pam_active() {
+    grep -qE '^auth[[:space:]]+required[[:space:]]+pam_google_authenticator\.so[[:space:]]*$' "$PAM_FILE"
+}
+
+sshd_active() {
+    grep -qE '^KbdInteractiveAuthentication[[:space:]]+yes[[:space:]]*$' "$SSHD_DROPIN" \
+        && grep -qE '^AuthenticationMethods[[:space:]]+publickey,keyboard-interactive[[:space:]]*$' "$SSHD_DROPIN"
+}
+
+if pam_active && sshd_active; then
+    echo "SSH OTP is already enabled correctly ($PAM_FILE + $SSHD_DROPIN both active)."
+    echo "(If you edited these files without restarting sshd since, run: sudo systemctl restart sshd)"
+    exit 0
+fi
+
+read -rp "Local CIDRs to exclude from OTP (comma-separated, e.g. 192.168.1.0/24,10.0.0.0/8; blank for none): " cidrs || cidrs=""
+
+cat <<STEPS
+
+SSH OTP is NOT fully enabled yet. To enable it, make these changes by hand:
+
+1. Edit $PAM_FILE and uncomment:
+       auth       required     pam_google_authenticator.so
+
+2. Edit $SSHD_DROPIN and uncomment:
+       KbdInteractiveAuthentication yes
+       AuthenticationMethods publickey,keyboard-interactive
+STEPS
+
+step=3
+if [[ -n "$cidrs" ]]; then
+    cat <<STEPS
+
+$step. In the same file, add this block (keeps your chosen CIDRs on publickey-only):
+       Match Address $cidrs
+           AuthenticationMethods publickey
+       Match all
+STEPS
+    step=$((step + 1))
+fi
+
+cat <<STEPS
+
+$step. Validate:  sudo sshd -t
+$((step + 1)). Restart:   sudo systemctl restart sshd
+$((step + 2)). Enroll your own TOTP secret: google-authenticator
+STEPS
+
+cat <<WARN
+
+WARNING: there is no "nullok" fallback in the PAM line above. Once these
+changes are live, EVERY account authenticates via TOTP or not at all --
+any account without a ~/.google_authenticator secret will be completely
+locked out of SSH. Enroll your own account (last step above) before you
+log out, and make sure any other account on this VM enrolls before its
+next SSH login (over an already-open session, or console/Proxmox access).
+WARN

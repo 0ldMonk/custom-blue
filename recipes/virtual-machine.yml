@@ -32,6 +32,8 @@ modules:
         - nodejs
         - borgbackup
         - rclone
+        - google-authenticator # SSH OTP capability, baked in but inert until
+                                # `enable-ssh-otp` is run manually per-VM
 
   - type: kargs
     kargs:
@@ -53,6 +55,7 @@ modules:
     snippets:
       - "chmod 0440 /etc/sudoers.d/pi"
       - "chmod 0755 /usr/libexec/rpm-ostree-reboot-required"
+      - "chmod 0755 /usr/bin/enable-ssh-otp"
 
   # node-exporter and the reboot-required timer both auto-start on boot here
   # (unlike node-exporter's package-only precedent elsewhere) since the
