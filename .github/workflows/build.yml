@@ -28,6 +28,7 @@ jobs:
           - proart.yml
           - desk.yml
           - virtual-machine.yml
+          - nas.yml
     steps:
       - name: Build Custom Image
         uses: blue-build/github-action@v1.12
