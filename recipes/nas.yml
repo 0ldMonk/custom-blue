@@ -24,6 +24,8 @@ modules:
         - cockpit-storaged
         - samba # file-sharing RPM pulls only samba-common-tools; smbd needs this
         - nfs-utils
+        - snapper
+        - borgmatic
         # no Fedora package or live COPR exists (checked 2026-07); el9 noarch
         # RPM installs cleanly on f44. Pinned — version bumps are manual:
         - https://github.com/45Drives/cockpit-file-sharing/releases/download/v4.6.1/cockpit-file-sharing-4.6.1-1.el9.noarch.rpm
