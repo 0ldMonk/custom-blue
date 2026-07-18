@@ -27,5 +27,6 @@ modules:
         # no Fedora package or live COPR exists (checked 2026-07); el9 noarch
         # RPM installs cleanly on f44. Pinned — version bumps are manual:
         - https://github.com/45Drives/cockpit-file-sharing/releases/download/v4.6.1/cockpit-file-sharing-4.6.1-1.el9.noarch.rpm
+        - https://github.com/45Drives/cockpit-identities/releases/download/v0.1.14-1/cockpit-identities-0.1.14-1.el9.noarch.rpm
 
   - type: signing
