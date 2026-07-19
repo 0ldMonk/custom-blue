@@ -11,9 +11,16 @@ modules:
         - "https://download.docker.com/linux/fedora/docker-ce.repo"
       copr:
         - atim/starship
+    # vim-default-editor conflicts with nano-default-editor (both Provide
+    # system-default-editor); the module runs `remove` before `install`.
+    remove:
+      packages:
+        - nano-default-editor
     install:
       packages:
         - micro
+        - vim-enhanced
+        - vim-default-editor # ships /etc/profile.d/*.sh setting EDITOR=vim
         - starship
         - zsh
         - zsh-autosuggestions
