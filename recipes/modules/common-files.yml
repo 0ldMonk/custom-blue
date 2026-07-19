@@ -1,8 +1,16 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# machine-specific files live in their own source dir (e.g. files/proart/)
-# and are copied by a files module in that recipe.
-type: files
-files:
-  - source: system
-    destination: /
+modules:
+  # machine-specific files live in their own source dir (e.g. files/proart/)
+  # and are copied by a files module in that recipe.
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  # relative symlink target, matching what timedatectl itself writes. /etc is
+  # 3-way merged, so this reaches systems that never set a timezone, while a
+  # local `timedatectl set-timezone` still wins on upgrade.
+  - type: script
+    snippets:
+      - "ln -sf ../usr/share/zoneinfo/America/Los_Angeles /etc/localtime"
