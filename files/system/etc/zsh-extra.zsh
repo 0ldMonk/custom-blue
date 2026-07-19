@@ -6,6 +6,9 @@
 autoload -U compinit
 compinit
 
+# EDITOR=vim makes zsh default to vi mode. Must precede fzf, whose ^R/^T bind into main.
+bindkey -e
+
 # History: persist to the invoking user's home dir, since this file is
 # sourced by every account (root, proart/desk users, VM's cloud-init pi user).
 HISTFILE="$HOME/.zsh_history"
