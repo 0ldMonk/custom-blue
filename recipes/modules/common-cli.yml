@@ -16,6 +16,7 @@ modules:
         - micro
         - starship
         - zsh
+        - zsh-autosuggestions
         - git
         - git-lfs
         - btop
