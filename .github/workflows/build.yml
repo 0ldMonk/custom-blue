@@ -26,6 +26,7 @@ jobs:
         recipe:
           # !! Add your recipes here
           - proart.yml
+          - proart-nvidia.yml
           - desk.yml
           - virtual-machine.yml
           - nas.yml

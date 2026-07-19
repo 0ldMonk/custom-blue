@@ -1,0 +1,53 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: monk-blue-proart-nvidia
+description: This is my personal OS image (ASUS ProArt PX13 laptop).
+
+base-image: ghcr.io/ublue-os/silverblue-main
+image-version: latest
+
+modules:
+  
+  - from-file: modules/nvidia.yml
+
+  - from-file: modules/common-files.yml
+  - from-file: modules/common-fonts.yml
+  - from-file: modules/common-kargs.yml
+  - from-file: modules/common-gnome-extensions.yml
+  - from-file: modules/common-packages.yml
+  - from-file: modules/common-firefox.yml
+  - from-file: modules/common-flatpaks.yml
+  - from-file: modules/common-brew.yml
+  - type: signing
+
+  # laptop-only files (/etc/environment hybrid AMD+nvidia GPU workarounds)
+  - type: files
+    files:
+      - source: proart
+        destination: /
+
+  - type: kargs
+    kargs:
+      - rcutree.enable_rcu_lazy=1
+      - clearcpuid=rdseed # Strix Point rdseed erratum workaround (laptop CPU)
+
+  - type: dnf
+    repos:
+      copr:
+        - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
+        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
+    remove:
+      packages:
+        - tuned-ppd
+        - tuned # using power-profiles-daemon instead
+    install:
+      packages:
+        - ananicy-cpp
+        - power-profiles-daemon
+        - pam-u2f
+        - pamu2fcfg
+
+  - type: default-flatpaks
+    configurations:
+      - scope: system
+        install: [] # laptop-only flatpaks
