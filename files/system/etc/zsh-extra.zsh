@@ -1,6 +1,11 @@
 # Sourced from /etc/zshrc (appended by the common-cli module) so every
 # interactive zsh shell gets these, independent of any per-user .zshrc.
 
+# Fedora runs compinit only from ~/.zshrc (shipped via /etc/skel), so root — which
+# has none — gets no completion at all. Must precede fzf/zoxide, which call compdef.
+autoload -U compinit
+compinit
+
 # History: persist to the invoking user's home dir, since this file is
 # sourced by every account (root, proart/desk users, VM's cloud-init pi user).
 HISTFILE="$HOME/.zsh_history"
