@@ -11,7 +11,8 @@ PAM_FILE=/etc/pam.d/sshd
 SSHD_DROPIN=/etc/ssh/sshd_config.d/20-otp.conf
 
 pam_active() {
-    grep -qE '^auth[[:space:]]+required[[:space:]]+pam_google_authenticator\.so[[:space:]]*$' "$PAM_FILE"
+    grep -qE '^auth[[:space:]]+required[[:space:]]+pam_google_authenticator\.so[[:space:]]*$' "$PAM_FILE" \
+        && ! grep -qE '^auth[[:space:]]+substack[[:space:]]+password-auth[[:space:]]*$' "$PAM_FILE"
 }
 
 sshd_active() {
@@ -34,16 +35,25 @@ SSH OTP is NOT fully enabled yet. To enable it, make these changes by hand:
 1. Edit $PAM_FILE and uncomment:
        auth       required     pam_google_authenticator.so
 
-2. Edit $SSHD_DROPIN and uncomment:
+2. In the same file, comment out (or delete) this line if present:
+       auth       substack     password-auth
+   The image ships without it, but /etc does a 3-way merge -- a system
+   whose $PAM_FILE was ever edited locally keeps its own copy forever and
+   never picks that up. Leaving it in means keyboard-interactive prompts
+   for the Unix password *after* the OTP, so you'd need both; accounts
+   with no usable password (root here) just fail outright.
+
+3. Edit $SSHD_DROPIN and uncomment:
        KbdInteractiveAuthentication yes
        AuthenticationMethods publickey,keyboard-interactive
 STEPS
 
-step=3
+step=4
 if [[ -n "$cidrs" ]]; then
     cat <<STEPS
 
-$step. In the same file, add this block (keeps your chosen CIDRs on publickey-only):
+$step. In the same file, add this block at the end (publickey-only from those
+   CIDRs, publickey+OTP from everywhere else):
        Match Address $cidrs
            AuthenticationMethods publickey
        Match all
@@ -62,8 +72,9 @@ cat <<WARN
 
 WARNING: there is no "nullok" fallback in the PAM line above. Once these
 changes are live, EVERY account authenticates via TOTP or not at all --
-any account without a ~/.google_authenticator secret will be completely
-locked out of SSH. Enroll your own account (last step above) before you
+any account without a ~/.google_authenticator secret is locked out of SSH
+from every address the publickey-only Match block above does not cover.
+Enroll your own account (last step above) before you
 log out, and make sure any other account on this VM enrolls before its
 next SSH login (over an already-open session, or console/Proxmox access).
 WARN
