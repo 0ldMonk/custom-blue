@@ -50,6 +50,7 @@ modules:
         - power-profiles-daemon
         - pam-u2f
         - pamu2fcfg
+        - fido2-tools
 
   - type: default-flatpaks
     configurations:
