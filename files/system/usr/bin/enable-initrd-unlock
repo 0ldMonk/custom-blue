@@ -1,0 +1,119 @@
+#!/bin/bash
+# Read-only: reports what's in place and prints the remaining commands to run.
+# Nothing here is bakeable — ip= is per-machine, and the key stays out of a
+# public image.
+set -euo pipefail
+
+CONF=/etc/dracut.conf.d/zz-crypt-ssh-local.conf
+ACL=/etc/dropbear/authorized_keys
+
+[[ -f $CONF ]] || {
+    echo "error: $CONF missing — image too old, or the file was removed" >&2
+    exit 1
+}
+
+if ! lsblk -no FSTYPE | grep -qx crypto_LUKS; then
+    echo "No LUKS volume here — nothing would ever wait in the initrd."
+    exit 0
+fi
+
+acl_ready() { [[ -s $ACL ]]; }
+initramfs_ready() { rpm-ostree initramfs | grep -q "enabled"; }
+kargs_ready() {
+    local k
+    k=$(rpm-ostree kargs)
+    [[ $k == *rd.neednet=1* && $k == *ip=* ]]
+}
+set_kargs() { rpm-ostree kargs | tr ' ' '\n' | grep -E '^(rd\.neednet|ip)=' | tr '\n' ' '; }
+
+read -r gw iface < <(ip -o -4 route show default | awk '{print $3, $5; exit}')
+cidr=$(ip -o -4 addr show dev "${iface:?no default route interface}" scope global | awk '{print $4; exit}')
+addr=${cidr%/*}
+prefix=${cidr#*/}
+# dracut's ip= wants a dotted netmask, not a prefix length
+m=$((0xffffffff ^ ((1 << (32 - prefix)) - 1)))
+printf -v mask "%d.%d.%d.%d" $((m >> 24 & 255)) $((m >> 16 & 255)) $((m >> 8 & 255)) $((m & 255))
+# ip=<client>:<server>:<gateway>:<netmask>:<hostname>:<device>:<autoconf>
+ipkarg="ip=${addr}::${gw}:${mask}::${iface}:off"
+
+if acl_ready && kargs_ready && initramfs_ready; then
+    cat <<ACTIVE
+Remote LUKS unlock is already fully enabled.
+
+  authorized  $(grep -c . "$ACL") key(s) in $ACL
+  kargs       $(set_kargs)
+  initramfs   regenerated locally on every deployment
+
+At the LUKS prompt after a reboot:
+
+    ssh -p 2222 root@${addr}
+    unlock
+
+ACTIVE
+    exit 0
+fi
+
+echo "Remote LUKS unlock is NOT fully enabled yet. Remaining steps:"
+echo
+step=1
+
+if ! acl_ready; then
+    cat <<STEPS
+$step. Authorize a key for the initrd. Separate from sshd's list — a key here
+   unlocks the disk but gets no shell on the booted system.
+
+       sudo install -D -m 0600 ~/.ssh/authorized_keys $ACL
+
+   Or paste a single key instead:
+
+       sudo install -d -m 0755 $(dirname "$ACL")
+       echo 'ssh-ed25519 AAAA... you@host' | sudo tee $ACL
+       sudo chmod 0600 $ACL
+
+STEPS
+    step=$((step + 1))
+else
+    echo "   (done) $(grep -c . "$ACL") key(s) authorized in $ACL"
+    echo
+fi
+
+if ! kargs_ready; then
+    cat <<STEPS
+$step. Give the initrd a network, using this machine's current address:
+
+       sudo rpm-ostree kargs --append-if-missing=rd.neednet=1 --append-if-missing=$ipkarg
+
+STEPS
+    step=$((step + 1))
+else
+    echo "   (done) kargs set: $(set_kargs)"
+    echo
+fi
+
+if ! initramfs_ready; then
+    cat <<STEPS
+$step. Put dropbear in the initrd. Adds a dracut run to every future update on
+   this machine, which is why it's opt-in per host:
+
+       sudo rpm-ostree initramfs --enable
+
+STEPS
+    step=$((step + 1))
+else
+    echo "   (done) local initramfs regeneration enabled"
+    echo
+fi
+
+cat <<STEPS
+$step. Reboot, then unlock remotely:
+
+       ssh -p 2222 root@${addr}
+       unlock
+
+The initrd reuses this system's sshd host keys, so expect no known_hosts prompt.
+
+To undo:
+
+    sudo rpm-ostree initramfs --disable
+    sudo rpm-ostree kargs --delete-if-present=rd.neednet=1 --delete-if-present=$ipkarg
+STEPS

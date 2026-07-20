@@ -29,13 +29,7 @@ modules:
         - google-authenticator # SSH OTP capability, baked in but inert until
                                 # `enable-ssh-otp` is run manually per-VM
 
-  - type: dnf
-    repos:
-      copr:
-        - uriesk/dracut-crypt-ssh
-    install:
-      packages:
-        - dracut-crypt-ssh
+  - from-file: modules/common-initrd-unlock.yml
 
   - type: kargs
     kargs:

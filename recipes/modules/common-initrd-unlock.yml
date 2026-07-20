@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
+# Remote LUKS unlock. Inert on every image: dropbear only reaches the initrd
+# via local regeneration, which `enable-initrd-unlock` walks through per machine.
+modules:
+  - type: dnf
+    repos:
+      copr:
+        - uriesk/dracut-crypt-ssh
+    install:
+      packages:
+        - dracut-crypt-ssh
+
+  - type: script
+    snippets:
+      - "chmod 0755 /usr/bin/enable-initrd-unlock"
