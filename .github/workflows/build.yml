@@ -41,3 +41,4 @@ jobs:
 
           maximize_build_space: true
           chunkah: true
+          use_cache: true
