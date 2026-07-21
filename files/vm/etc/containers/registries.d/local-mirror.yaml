@@ -1,0 +1,5 @@
+# Cosign .sig is fetched from the host actually pulled from, so the mirror
+# needs its own attachments entry or signature verification fails through it.
+docker:
+  ghcr-mirror.lan:7272:
+    use-sigstore-attachments: true
