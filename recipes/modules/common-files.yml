@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
 modules:
-  # machine-specific files live in their own source dir (e.g. files/proart/)
+  # machine-specific files live in their own source dir (e.g. files/nvidia-hybrid/)
   # and are copied by a files module in that recipe.
   - type: files
     files:

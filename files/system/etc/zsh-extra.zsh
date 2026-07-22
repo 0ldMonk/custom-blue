@@ -10,7 +10,7 @@ compinit
 bindkey -e
 
 # History: persist to the invoking user's home dir, since this file is
-# sourced by every account (root, proart/desk users, VM's cloud-init pi user).
+# sourced by every account (root, desktop users, VM's cloud-init pi user).
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000

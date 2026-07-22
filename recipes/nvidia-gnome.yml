@@ -1,13 +1,15 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: monk-blue-proart-nvidia
-description: This is my personal OS image (ASUS ProArt PX13 laptop).
+name: monk-blue-nvidia-gnome
+description: This is my personal OS image (GNOME + nvidia-hybrid — shared by the laptop (AMD iGPU) and the desktop (Intel iGPU)).
 
 base-image: ghcr.io/ublue-os/silverblue-main
 image-version: latest
 
 modules:
-  
+  # MUST run first, against the pristine base image: the akmods nvidia install
+  # pulls 32-bit (i686) mesa, and if a prior dnf module (rpmfusion/firefox) has
+  # already bumped the x86_64 mesa stack, the lagging i686 mesa conflicts.
   - from-file: modules/nvidia.yml
 
   - from-file: modules/common-files.yml
@@ -20,22 +22,24 @@ modules:
   - from-file: modules/common-brew.yml
   - type: signing
 
-  # laptop-only files (/etc/environment hybrid AMD+nvidia GPU workarounds)
+  # Both machines are iGPU-display + nvidia-compute hybrids (laptop: AMD iGPU,
+  # desktop: Intel iGPU). /etc/environment pins EGL to mesa so the GNOME session
+  # renders on the iGPU, leaving nvidia free for compute (llama-server / local
+  # LLM). The files/nvidia-hybrid/ dir is shared with nvidia-cosmic.
   - type: files
     files:
-      - source: proart
+      - source: nvidia-hybrid
         destination: /
 
   - type: kargs
     kargs:
       - rcutree.enable_rcu_lazy=1
-      - clearcpuid=rdseed # Strix Point rdseed erratum workaround (laptop CPU)
 
   - type: dnf
     repos:
       copr:
         - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
-        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
+        - itotm/cachyos-kernel-znver4 # laptop-only: overlay cachy-os kernel live if needed
     remove:
       packages:
         - tuned-ppd
@@ -47,8 +51,9 @@ modules:
         - pam-u2f
         - pamu2fcfg
         - fido2-tools
+        - kitty
 
   - type: default-flatpaks
     configurations:
       - scope: system
-        install: [] # laptop-only flatpaks
+        install: []

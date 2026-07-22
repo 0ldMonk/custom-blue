@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: monk-blue-proart-nvidia-cosmic
-description: This is my personal OS image (ASUS ProArt PX13 laptop, COSMIC desktop).
+name: monk-blue-nvidia-cosmic
+description: This is my personal OS image (nvidia-hybrid laptop, COSMIC desktop).
 
 # base-main (not silverblue-main): the desktop-less ublue base. COSMIC is layered
 # via dnf below. Still a ublue image, so nvidia.yml's akmods match its kernel.
@@ -10,7 +10,7 @@ image-version: latest
 
 modules:
 
-  - from-file: modules/nvidia.yml # must stay FIRST — mesa i686 multilib conflict (see desk.yml)
+  - from-file: modules/nvidia.yml # must stay FIRST — mesa i686 multilib conflict (see nvidia-gnome.yml)
 
   - from-file: modules/common-files.yml
   - from-file: modules/common-fonts.yml
@@ -39,16 +39,16 @@ modules:
     snippets:
       - "systemctl set-default graphical.target"
 
-  # laptop-only files (/etc/environment hybrid AMD+nvidia GPU workarounds)
+  # /etc/environment EGL→mesa pin (iGPU-display + nvidia-compute hybrid);
+  # files/nvidia-hybrid/ dir is shared with nvidia-gnome.
   - type: files
     files:
-      - source: proart
+      - source: nvidia-hybrid
         destination: /
 
   - type: kargs
     kargs:
       - rcutree.enable_rcu_lazy=1
-      - clearcpuid=rdseed # Strix Point rdseed erratum workaround (laptop CPU)
 
   - type: dnf
     repos:

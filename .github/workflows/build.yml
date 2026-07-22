@@ -25,9 +25,8 @@ jobs:
       matrix:
         recipe:
           # !! Add your recipes here
-          - proart-nvidia.yml
-          - proart-nvidia-cosmic.yml
-          - desk.yml
+          - nvidia-gnome.yml
+          - nvidia-cosmic.yml
           - virtual-machine.yml
     steps:
       - name: Build Custom Image

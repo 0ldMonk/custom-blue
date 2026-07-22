@@ -44,7 +44,7 @@ modules:
 
   # ostree never overwrites already-existing local /etc content on upgrade,
   # so this only affects NEW accounts (and root, which already exists in the
-  # base image) — not already-deployed proart/desk accounts, which were
+  # base image) — not already-deployed desktop accounts, which were
   # switched to zsh live via `chsh`.
   - type: script
     snippets:
