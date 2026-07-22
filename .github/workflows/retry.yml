@@ -1,0 +1,19 @@
+name: retry-failed-build
+on:
+  workflow_run:
+    workflows: ["bluebuild"] # matches the name: in build.yml
+    types: [completed]
+permissions:
+  actions: write
+jobs:
+  rerun:
+    # run_attempt < 2 caps it at one auto-retry: a rerun fires workflow_run again, so without
+    # the guard a persistently-failing build would loop forever.
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.run_attempt < 2
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh run rerun ${{ github.event.workflow_run.id }} --failed --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ github.token }}
