@@ -7,8 +7,10 @@ modules:
     repos:
       keys:
         - "https://repo.vscodium.dev/vscodium.gpg"
+        - "https://pkg.claude-desktop-debian.dev/KEY.gpg"
       files:
         - "https://repo.vscodium.dev/vscodium.repo"
+        - "https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo"
       nonfree: rpmfusion
     install:
       packages:
@@ -16,3 +18,4 @@ modules:
         - powertop
         - s-tui
         - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
+        - claude-desktop-unofficial
