@@ -55,14 +55,13 @@ modules:
       copr:
         - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
         - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
-    remove:
-      packages:
-        - tuned-ppd
-        - tuned # using power-profiles-daemon instead
+    # No tuned-ppd/power-profiles-daemon swap here (unlike nvidia-gnome):
+    # cosmic-settings hard-requires tuned-ppd, and ppd Conflicts it (both
+    # provide ppd-service). Removing tuned-ppd cascades cosmic-settings ->
+    # cosmic-session -> the whole desktop out of the image.
     install:
       packages:
         - ananicy-cpp
-        - power-profiles-daemon
         - pam-u2f
         - pamu2fcfg
         - fido2-tools
