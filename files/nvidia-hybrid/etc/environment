@@ -1,2 +1,6 @@
 GSK_RENDERER=gl
 __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+# EGL pin above doesn't cover Vulkan; wgpu apps (cosmic-workspaces) would
+# load nvidia_icd and wake the dGPU. Restrict Vulkan to the iGPU (radeon+intel,
+# both arches); nvidia_icd omitted. CUDA/NVENC unaffected (libcuda, not Vulkan).
+VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/radeon_icd.x86_64.json:/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/intel_icd.x86_64.json:/usr/share/vulkan/icd.d/intel_icd.i686.json
