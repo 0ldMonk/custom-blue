@@ -1,0 +1,7 @@
+# Shared fleet Starship config (Starship has no system-wide config path of its
+# own; STARSHIP_CONFIG in /etc/zsh-extra.zsh points every account here).
+
+# Default is ssh_only=true, which hides the hostname on local shells — show it
+# always so root/local sessions are as identifiable as SSH ones.
+[hostname]
+ssh_only = false

@@ -33,6 +33,12 @@ fi
 # Set up the Starship prompt
 if command -v starship > /dev/null 2>&1
 then
+	# Starship has no system-wide config path, so point every account (incl.
+	# root) at the shared one; a per-user ~/.config/starship.toml still wins.
+	if [[ -z "$STARSHIP_CONFIG" && ! -f "$HOME/.config/starship.toml" && -f /etc/starship.toml ]]
+	then
+		export STARSHIP_CONFIG=/etc/starship.toml
+	fi
 	eval "$(starship init zsh)"
 fi
 
