@@ -37,13 +37,13 @@ jobs:
       matrix:
         include:
           - image: monk-blue-nvidia-gnome
-            types: --type anaconda-iso
+            types: anaconda-iso
             rootfs: btrfs # ublue desktop default
           - image: monk-blue-nvidia-cosmic
-            types: --type anaconda-iso
+            types: anaconda-iso
             rootfs: btrfs
           - image: monk-blue-vm
-            types: --type anaconda-iso --type qcow2
+            types: anaconda-iso qcow2
             rootfs: xfs # fedora-bootc default
     env:
       IMAGE: ghcr.io/0ldmonk/${{ matrix.image }}:latest
@@ -60,13 +60,16 @@ jobs:
           set -euo pipefail
           mkdir -p output
           sudo podman pull "$IMAGE" # :latest is anonymously pullable, no login
-          sudo podman run --rm --privileged \
-            --security-opt label=type:unconfined_t \
-            -v /var/lib/containers/storage:/var/lib/containers/storage \
-            -v "$PWD/output:/output" \
-            quay.io/centos-bootc/bootc-image-builder:latest \
-            ${{ matrix.types }} --rootfs ${{ matrix.rootfs }} \
-            "$IMAGE"
+          # BIB refuses to mix ISO and disk types in one run — invoke it per type.
+          for t in ${{ matrix.types }}; do
+            sudo podman run --rm --privileged \
+              --security-opt label=type:unconfined_t \
+              -v /var/lib/containers/storage:/var/lib/containers/storage \
+              -v "$PWD/output:/output" \
+              quay.io/centos-bootc/bootc-image-builder:latest \
+              --type "$t" --rootfs ${{ matrix.rootfs }} \
+              "$IMAGE"
+          done
 
       - name: Publish to rolling release
         run: |
