@@ -12,7 +12,7 @@ modules:
       - 517   # Caffeine
       - 2236  # Night Theme Switcher
       - 615   # AppIndicator and KStatusNotifierItem Support
-      - 9875  # O-tiling
+     # - 9875  # O-tiling
       - 4998  # Legacy (GTK3) Theme Scheme Auto Switcher
       - 1401  # Bluetooth Quick Connect
       - 3193  # Blur my Shell
