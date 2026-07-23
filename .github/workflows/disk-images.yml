@@ -38,13 +38,10 @@ jobs:
         include:
           - image: monk-blue-nvidia-gnome
             types: anaconda-iso
-            rootfs: btrfs # ublue desktop default
           - image: monk-blue-nvidia-cosmic
             types: anaconda-iso
-            rootfs: btrfs
           - image: monk-blue-vm
             types: anaconda-iso qcow2
-            rootfs: xfs # fedora-bootc default
     env:
       IMAGE: ghcr.io/0ldmonk/${{ matrix.image }}:latest
     steps:
@@ -60,15 +57,25 @@ jobs:
           set -euo pipefail
           mkdir -p output
           sudo podman pull "$IMAGE" # :latest is anonymously pullable, no login
+          # Empty kickstart -> fully interactive Anaconda: the installer picks
+          # partitioning/filesystem/LUKS and creates the user (no baked creds).
+          printf '[customizations.installer.kickstart]\ncontents = ""\n' > iso.toml
+          # qcow2's default root partition is too small to boot; size it up.
+          printf '[[customizations.filesystem]]\nmountpoint = "/"\nminsize = "15 GiB"\n' > qcow2.toml
           # BIB refuses to mix ISO and disk types in one run — invoke it per type.
           for t in ${{ matrix.types }}; do
+            args=(--type "$t")
+            case "$t" in
+              qcow2) args+=(--rootfs ext4); cfg=qcow2.toml ;;
+              *) cfg=iso.toml ;;
+            esac
             sudo podman run --rm --privileged \
               --security-opt label=type:unconfined_t \
               -v /var/lib/containers/storage:/var/lib/containers/storage \
               -v "$PWD/output:/output" \
+              -v "$PWD/$cfg:/config.toml:ro" \
               quay.io/centos-bootc/bootc-image-builder:latest \
-              --type "$t" --rootfs ${{ matrix.rootfs }} \
-              "$IMAGE"
+              "${args[@]}" "$IMAGE"
           done
 
       - name: Publish to rolling release

@@ -40,8 +40,10 @@ image's `:latest` tag and publishing to a single rolling GitHub release tagged
 
 - `<image>-installer.iso.xz` — Anaconda **installer** ISO for every image
   (`monk-blue-nvidia-gnome`, `monk-blue-nvidia-cosmic`, `monk-blue-vm`). Boot a
-  blank machine/VM from it to install onto disk (these are installers, not
-  live-desktop ISOs).
+  blank machine/VM from it and run the **fully interactive** installer — you
+  choose disk layout / filesystem / LUKS encryption and create the user and root
+  password (no credentials are baked into the ISO). These are installers, not
+  live-desktop ISOs.
 - `monk-blue-vm.qcow2` — VM only. Directly bootable: import as a Proxmox disk or
   template; user/SSH/hostname come from Cloud-Init, not the image.
 
