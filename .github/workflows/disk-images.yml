@@ -64,9 +64,11 @@ jobs:
           printf '[[customizations.filesystem]]\nmountpoint = "/"\nminsize = "15 GiB"\n' > qcow2.toml
           # BIB refuses to mix ISO and disk types in one run — invoke it per type.
           for t in ${{ matrix.types }}; do
-            args=(--type "$t")
+            # BIB requires --rootfs to build the manifest even for the ISO (neither
+            # base image declares a default); the interactive installer overrides it.
+            args=(--type "$t" --rootfs ext4)
             case "$t" in
-              qcow2) args+=(--rootfs ext4); cfg=qcow2.toml ;;
+              qcow2) cfg=qcow2.toml ;;
               *) cfg=iso.toml ;;
             esac
             sudo podman run --rm --privileged \
