@@ -56,4 +56,4 @@ modules:
       # zsh shell regardless of whether a per-user ~/.zshrc exists, so this
       # reaches root and any account created later (e.g. the VM's cloud-init
       # pi user) without depending on /etc/skel or home-dir timing.
-      - "echo 'source /etc/zsh-extra.zsh' >> /etc/zshrc"
+      - "echo 'source /etc/zsh-custom-config/zsh-extra.zsh' >> /etc/zshrc"
