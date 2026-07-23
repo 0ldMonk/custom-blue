@@ -30,9 +30,47 @@ To rebase an existing atomic Fedora installation to the latest build:
 
 The `latest` tag will automatically point to the latest build. That build will still always use the Fedora version specified in `recipe.yml`, so you won't get accidentally updated to the next major version.
 
-## ISO
+## Installer ISOs & VM disk image
 
-If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/how-to/generate-iso/#_top). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
+The [`disk-images`](.github/workflows/disk-images.yml) workflow runs every ~3 days
+(and on manual dispatch), building with
+[`bootc-image-builder`](https://github.com/osbuild/bootc-image-builder) from each
+image's `:latest` tag and publishing to a single rolling GitHub release tagged
+[`images-latest`](../../releases/tag/images-latest) (assets overwritten each run):
+
+- `<image>-installer.iso.xz` — Anaconda **installer** ISO for every image
+  (`monk-blue-nvidia-gnome`, `monk-blue-nvidia-cosmic`, `monk-blue-vm`). Boot a
+  blank machine/VM from it to install onto disk (these are installers, not
+  live-desktop ISOs).
+- `monk-blue-vm.qcow2` — VM only. Directly bootable: import as a Proxmox disk or
+  template; user/SSH/hostname come from Cloud-Init, not the image.
+
+Every artifact ships a `.md5` sidecar. Anything over GitHub's 2 GiB per-asset cap
+(the desktop ISOs) is split into `<name>.part00`, `.part01`, … pieces you
+reassemble after download.
+
+### Download & assemble
+
+```bash
+# 1. from the release page, download every .partNN (or the single file if it
+#    wasn't split) plus the matching .md5:
+#    https://github.com/0ldmonk/custom-blue/releases/tag/images-latest
+
+# 2. reassemble — skip if there are no .partNN files (artifact wasn't split):
+cat monk-blue-nvidia-gnome-installer.iso.xz.part* > monk-blue-nvidia-gnome-installer.iso.xz
+
+# 3. verify integrity:
+md5sum -c monk-blue-nvidia-gnome-installer.iso.xz.md5
+
+# 4. decompress the ISO before use (the qcow2 needs no decompression):
+unxz monk-blue-nvidia-gnome-installer.iso.xz
+```
+
+> [!NOTE]
+> Hosting these on Releases is within GitHub's terms — they're the repo's own
+> build outputs (Releases' intended use), and the rolling tag overwrites old
+> assets each run so total storage stays bounded, rather than accumulating as
+> bulk file storage.
 
 ## Verification
 

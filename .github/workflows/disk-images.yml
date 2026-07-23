@@ -1,0 +1,97 @@
+name: disk-images
+on:
+  schedule:
+    # every ~3rd day, after the 06:00 image build. */3 gives a shorter gap at
+    # month boundaries — fine for a rolling artifact.
+    - cron: "00 08 */3 * *"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+env:
+  TAG: images-latest
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ github.token }}
+jobs:
+  # Create the release up front so the parallel matrix jobs don't race to create it.
+  prepare-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Ensure rolling release exists
+        run: |
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" \
+            --title "Installer ISOs + VM disk image (rolling)" \
+            --notes "Rolling Anaconda installer ISOs for every image plus a qcow2 disk for monk-blue-vm, rebuilt every ~3 days from each image's :latest tag. Assets over GitHub's 2 GiB cap are split into .partNN pieces (reassemble per the README); each artifact ships a .md5. Assets are overwritten in place."
+
+  disk-images:
+    needs: prepare-release
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # upload to the rolling release
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: monk-blue-nvidia-gnome
+            types: --type anaconda-iso
+            rootfs: btrfs # ublue desktop default
+          - image: monk-blue-nvidia-cosmic
+            types: --type anaconda-iso
+            rootfs: btrfs
+          - image: monk-blue-vm
+            types: --type anaconda-iso --type qcow2
+            rootfs: xfs # fedora-bootc default
+    env:
+      IMAGE: ghcr.io/0ldmonk/${{ matrix.image }}:latest
+    steps:
+      - name: Free up runner disk
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune --all --force || true
+          df -h /
+
+      - name: Build with bootc-image-builder
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          sudo podman pull "$IMAGE" # :latest is anonymously pullable, no login
+          sudo podman run --rm --privileged \
+            --security-opt label=type:unconfined_t \
+            -v /var/lib/containers/storage:/var/lib/containers/storage \
+            -v "$PWD/output:/output" \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            ${{ matrix.types }} --rootfs ${{ matrix.rootfs }} \
+            "$IMAGE"
+
+      - name: Publish to rolling release
+        run: |
+          set -euo pipefail
+          sudo chown -R "$(id -u):$(id -g)" output # BIB writes output/ as root
+
+          publish() { # md5 the artifact, split if over the 2 GiB cap, then upload
+            local f="$1"
+            md5sum "$f" > "$f.md5"
+            # part count varies run-to-run, and --clobber only overwrites matching
+            # names — so drop this artifact's old assets first to avoid stale parts.
+            gh release view "$TAG" --json assets -q '.assets[].name' \
+              | grep -E "^$f(\.md5|\.part[0-9]+)?$" \
+              | while read -r a; do gh release delete-asset "$TAG" "$a" -y; done || true
+            if [ "$(stat -c%s "$f")" -ge $((1900 * 1024 * 1024)) ]; then
+              split -b 1900M -d -a 2 "$f" "$f.part"; rm -f "$f"
+              gh release upload "$TAG" "$f".part* "$f.md5" --clobber
+            else
+              gh release upload "$TAG" "$f" "$f.md5" --clobber
+            fi
+          }
+
+          xz -T0 -c output/bootiso/install.iso > "${{ matrix.image }}-installer.iso.xz"
+          publish "${{ matrix.image }}-installer.iso.xz"
+          if [ -f output/qcow2/disk.qcow2 ]; then
+            mv output/qcow2/disk.qcow2 "${{ matrix.image }}.qcow2"
+            publish "${{ matrix.image }}.qcow2"
+          fi
