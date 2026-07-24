@@ -14,6 +14,9 @@ modules:
     remove:
       packages:
         - nano-default-editor # conflicts with vim-default-editor
+        - vim-minimal # owns /usr/bin/vi; drop it so the vi->vim symlink below
+                      # (script module) owns that path cleanly instead of
+                      # shadowing an RPM-owned file
     install:
       packages:
         - micro
@@ -51,6 +54,11 @@ modules:
       - "sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd"
       - "usermod --shell /usr/bin/zsh root" # chsh (util-linux) is missing from
                                              # the base image; usermod (shadow-utils) does the same job
+
+      # `vi` (/usr/bin/vi) comes from vim-minimal; point it at the vim-enhanced
+      # binary so `vi` == full vim everywhere (scripts/sudo too, not just an
+      # interactive shell alias). Relative target resolves within /usr/bin.
+      - "ln -sf vim /usr/bin/vi"
 
       # /etc/zshrc (shipped by the zsh package) is sourced by every interactive
       # zsh shell regardless of whether a per-user ~/.zshrc exists, so this
