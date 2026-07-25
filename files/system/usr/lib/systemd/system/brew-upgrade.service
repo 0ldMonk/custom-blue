@@ -1,0 +1,21 @@
+[Unit]
+Description=Update and upgrade Homebrew packages
+Wants=network-online.target
+After=network-online.target local-fs.target
+# The opt-in switch — brew is installed per-host into /var, never in the image.
+ConditionPathIsSymbolicLink=/home/linuxbrew/.linuxbrew/bin/brew
+
+[Service]
+Type=oneshot
+User=1000
+Environment=HOMEBREW_PREFIX=/home/linuxbrew/.linuxbrew
+Environment=HOMEBREW_CELLAR=/home/linuxbrew/.linuxbrew/Cellar
+Environment=HOMEBREW_REPOSITORY=/home/linuxbrew/.linuxbrew/Homebrew
+ExecStart=/home/linuxbrew/.linuxbrew/bin/brew update
+ExecStart=/home/linuxbrew/.linuxbrew/bin/brew upgrade
+# These shadow system binaries via brew's bin on PATH; '-' == best-effort.
+ExecStartPost=-/home/linuxbrew/.linuxbrew/bin/brew unlink systemd
+ExecStartPost=-/home/linuxbrew/.linuxbrew/bin/brew unlink dbus
+ExecStartPost=-/home/linuxbrew/.linuxbrew/bin/brew unlink gsettings
+ExecStartPost=-/home/linuxbrew/.linuxbrew/bin/brew unlink bash
+ExecStartPost=-/home/linuxbrew/.linuxbrew/bin/brew unlink rpm

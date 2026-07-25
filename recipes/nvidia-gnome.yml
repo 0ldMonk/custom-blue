@@ -19,7 +19,6 @@ modules:
   - from-file: modules/common-packages.yml
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
-  - from-file: modules/common-brew.yml
   - type: signing
 
   # Both machines are iGPU-display + nvidia-compute hybrids (laptop: AMD iGPU,

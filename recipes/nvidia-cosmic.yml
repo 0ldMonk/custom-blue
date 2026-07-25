@@ -17,7 +17,6 @@ modules:
   - from-file: modules/common-kargs.yml
   - from-file: modules/common-packages.yml
   - from-file: modules/common-firefox.yml
-  - from-file: modules/common-brew.yml
   # no common-gnome-extensions / common-flatpaks — those are the GNOME side
   - type: signing
 

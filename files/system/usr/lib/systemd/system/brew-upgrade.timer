@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily Homebrew update and upgrade
+
+[Timer]
+OnCalendar=daily
+# Persistent= is honoured for OnCalendar only; OnUnitInactiveSec would silently
+# skip a machine that was asleep at the scheduled time.
+Persistent=true
+RandomizedDelaySec=30m
+
+[Install]
+WantedBy=timers.target

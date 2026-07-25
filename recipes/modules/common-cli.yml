@@ -65,3 +65,9 @@ modules:
       # reaches root and any account created later (e.g. the VM's cloud-init
       # pi user) without depending on /etc/skel or home-dir timing.
       - "echo 'source /etc/zsh-custom-config/zsh-extra.zsh' >> /etc/zshrc"
+
+  # Inert where brew isn't installed — see the unit's ConditionPathIsSymbolicLink.
+  - type: systemd
+    system:
+      enabled:
+        - brew-upgrade.timer

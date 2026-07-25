@@ -1,9 +1,0 @@
----
-# yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-type: brew
-auto-update: true
-update-interval: "1d"
-update-wait-after-boot: "10m"
-auto-upgrade: true
-upgrade-interval: "1d"
-upgrade-wait-after-boot: "30m"
