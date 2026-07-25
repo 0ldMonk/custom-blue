@@ -6,3 +6,4 @@ cosign.private
 .claude/
 docs/
 CLAUDE.md
+/.bluebuild-scripts_*
