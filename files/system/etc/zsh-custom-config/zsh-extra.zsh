@@ -30,12 +30,6 @@ then
 	eval "$(zoxide init zsh)"
 fi
 
-# atuin owns ^R, so it must source after fzf (which also binds ^R); fzf keeps ^T.
-if command -v atuin > /dev/null 2>&1
-then
-	eval "$(atuin init zsh)"
-fi
-
 # Set up the Starship prompt
 if command -v starship > /dev/null 2>&1
 then
