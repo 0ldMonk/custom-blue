@@ -67,7 +67,9 @@ modules:
       - "echo 'source /etc/zsh-custom-config/zsh-extra.zsh' >> /etc/zshrc"
 
   # Inert where brew isn't installed — see the unit's ConditionPathIsSymbolicLink.
+  # Name is deliberately not brew-upgrade.*: that's what BlueBuild's own brew
+  # module installs, and one would silently overwrite the other if it came back.
   - type: systemd
     system:
       enabled:
-        - brew-upgrade.timer
+        - brew-upgrade-monk-blue.timer
