@@ -46,3 +46,10 @@ if [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]
 then
 	source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
+
+# Per-user checkout, so absent on most accounts; `&&` as the last statement would
+# leave $? = 1 there and make starship's status module flag the first prompt.
+if [[ -f ~/git/common-config/home-links/alias.sh ]]
+then
+	source ~/git/common-config/home-links/alias.sh
+fi
