@@ -32,4 +32,12 @@ modules:
         - https://github.com/45Drives/cockpit-file-sharing/releases/download/v4.6.1/cockpit-file-sharing-4.6.1-1.el9.noarch.rpm
         - https://github.com/45Drives/cockpit-identities/releases/download/v0.1.14-1/cockpit-identities-0.1.14-1.el9.noarch.rpm
 
+  # Nested-VM management via cockpit-machines/libvirt/qemu.
+  - type: dnf
+    install:
+      packages:
+        - cockpit-machines
+        - libvirt
+        - qemu-kvm
+
   - type: signing
