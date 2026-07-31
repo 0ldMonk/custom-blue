@@ -16,6 +16,7 @@ modules:
   - from-file: modules/common-fonts.yml
   - from-file: modules/common-kargs.yml
   - from-file: modules/common-gnome-extensions.yml
+  - from-file: modules/common-niri-dms.yml
   - from-file: modules/common-packages.yml
   - from-file: modules/common-firefox.yml
   - from-file: modules/common-flatpaks.yml
