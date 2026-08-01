@@ -21,3 +21,4 @@ modules:
         - matugen           # wallpaper-based theming
         - qt6-qtmultimedia  # media-widget album art
         - brightnessctl     # niri keybind shells out to this for brightness keys
+        - nautilus          # file manager; matches dms's own default keybind, light deps (no gnome-shell)
