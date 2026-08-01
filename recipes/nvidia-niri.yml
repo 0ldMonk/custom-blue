@@ -62,10 +62,13 @@ modules:
       copr:
         - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
         - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
-    # Matches nvidia-gnome/nvidia-cosmic: keep tuned-ppd, not power-profiles-daemon.
+    # Unlike nvidia-gnome (ships in silverblue-main) and nvidia-cosmic (pulled in
+    # as a hard dep of the cosmic-desktop group), base-main has no path that
+    # drags tuned-ppd in for niri, so it needs an explicit install here.
     install:
       packages:
         - ananicy-cpp
         - pam-u2f
         - pamu2fcfg
         - fido2-tools
+        - tuned-ppd
