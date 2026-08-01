@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: monk-blue-nvidia-niri
+description: This is my personal OS image (niri + dms, nvidia-hybrid — shared by the laptop (AMD iGPU) and the desktop (Intel iGPU)).
+
+# base-main (not silverblue-main): the desktop-less ublue base, same choice
+# as nvidia-cosmic.yml. niri is its own session, no GNOME/GDM involved.
+base-image: ghcr.io/ublue-os/base-main
+image-version: latest
+
+modules:
+
+  - from-file: modules/nvidia.yml # must stay FIRST — mesa i686 multilib conflict (see nvidia-gnome.yml)
+
+  - from-file: modules/common-files.yml
+  - from-file: modules/common-fonts.yml
+  - from-file: modules/common-kargs.yml
+  - from-file: modules/common-niri-dms.yml
+  - from-file: modules/common-packages.yml
+  - from-file: modules/common-firefox.yml
+  # no common-gnome-extensions / common-flatpaks — those are the GNOME side
+  - type: signing
+
+  # dms-greeter matches dms's own theming and reuses the danklinux COPR
+  # already needed for niri+dms — no new upstream party (regreet has no
+  # working Fedora 44 build anywhere; tuigreet works but is TUI-only).
+  - type: dnf
+    repos:
+      copr:
+        - avengemedia/danklinux
+    install:
+      packages:
+        - greetd
+        - dms-greeter
+        # niri has no default terminal binding target, unlike GNOME/COSMIC.
+        - kitty
+  - type: files
+    files:
+      - source: niri
+        destination: /
+  - type: systemd
+    system:
+      enabled:
+        - greetd.service
+  - type: script
+    snippets:
+      - "systemctl set-default graphical.target"
+
+  # /etc/environment EGL→mesa pin (iGPU-display + nvidia-compute hybrid);
+  # files/nvidia-hybrid/ dir is shared with nvidia-gnome and nvidia-cosmic.
+  - type: files
+    files:
+      - source: nvidia-hybrid
+        destination: /
+
+  - type: kargs
+    kargs:
+      - rcutree.enable_rcu_lazy=1
+
+  - type: dnf
+    repos:
+      copr:
+        - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
+        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
+    # Matches nvidia-gnome/nvidia-cosmic: keep tuned-ppd, not power-profiles-daemon.
+    install:
+      packages:
+        - ananicy-cpp
+        - pam-u2f
+        - pamu2fcfg
+        - fido2-tools

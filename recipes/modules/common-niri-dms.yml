@@ -1,8 +1,8 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# niri+dms as a second, selectable GDM session alongside GNOME (nvidia-gnome
-# only). niri itself is official Fedora (43+), no COPR needed; quickshell/dgop
-# and dms/dms-cli come from avengemedia's own COPRs (danklinux + dms) so there's
+# niri + dms (Dank Material Shell) — the desktop stack for nvidia-niri.
+# niri itself is official Fedora (43+), no COPR needed; quickshell/dgop and
+# dms/dms-cli come from avengemedia's own COPRs (danklinux + dms) so there's
 # only one upstream party behind the non-Fedora packages.
 modules:
   - type: dnf
