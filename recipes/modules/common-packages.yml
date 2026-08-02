@@ -16,5 +16,6 @@ modules:
       packages:
         - powertop
         - s-tui
+        - python3-amd-debug-tools
         - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
         - claude-desktop-unofficial
