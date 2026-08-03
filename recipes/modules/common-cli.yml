@@ -33,6 +33,7 @@ modules:
         - fzf
         - jq
         - sysbench
+        - stress-ng
         - tmux
         - tailscale
         - rsync
