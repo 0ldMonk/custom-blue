@@ -38,8 +38,6 @@ jobs:
         include:
           - image: monk-blue-nvidia-gnome
             types: anaconda-iso
-          - image: monk-blue-nvidia-cosmic
-            types: anaconda-iso
           - image: monk-blue-vm
             types: anaconda-iso qcow2
     env:

@@ -24,7 +24,7 @@ modules:
   # Both machines are iGPU-display + nvidia-compute hybrids (laptop: AMD iGPU,
   # desktop: Intel iGPU). /etc/environment pins EGL to mesa so the GNOME session
   # renders on the iGPU, leaving nvidia free for compute (llama-server / local
-  # LLM). The files/nvidia-hybrid/ dir is shared with nvidia-cosmic.
+  # LLM). The files/nvidia-hybrid/ dir is shared with nvidia-niri.
   - type: files
     files:
       - source: nvidia-hybrid
@@ -40,8 +40,8 @@ modules:
         - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
         - itotm/cachyos-kernel-znver4 # laptop-only: overlay cachy-os kernel live if needed
     # Keep the base's tuned-ppd (Fedora's default ppd-service provider since
-    # F41) instead of swapping in power-profiles-daemon — matches the cosmic
-    # image, which hard-requires tuned-ppd, so the fleet runs one power backend.
+    # F41) instead of swapping in power-profiles-daemon — matches nvidia-niri,
+    # which installs tuned-ppd explicitly, so the fleet runs one power backend.
     install:
       packages:
         - ananicy-cpp

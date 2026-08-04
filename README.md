@@ -39,7 +39,7 @@ image's `:latest` tag and publishing to a single rolling GitHub release tagged
 [`images-latest`](../../releases/tag/images-latest) (assets overwritten each run):
 
 - `<image>-installer.iso.xz` — Anaconda **installer** ISO for every image
-  (`monk-blue-nvidia-gnome`, `monk-blue-nvidia-cosmic`, `monk-blue-vm`). Boot a
+  (`monk-blue-nvidia-gnome`, `monk-blue-vm`). Boot a
   blank machine/VM from it and run the **fully interactive** installer — you
   choose disk layout / filesystem / LUKS encryption and create the user and root
   password (no credentials are baked into the ISO). These are installers, not

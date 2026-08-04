@@ -26,7 +26,6 @@ jobs:
         recipe:
           # !! Add your recipes here
           - nvidia-gnome.yml
-          - nvidia-cosmic.yml
           - nvidia-niri.yml
           - virtual-machine.yml
     steps:
