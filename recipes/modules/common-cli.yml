@@ -22,6 +22,7 @@ modules:
         - micro
         - vim-enhanced
         - vim-default-editor
+        - iperf3
         - starship
         - zsh
         - zsh-autosuggestions
