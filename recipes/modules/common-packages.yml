@@ -19,3 +19,5 @@ modules:
         - python3-amd-debug-tools
         - codium # VSCodium: open-source VS Code build, no MS branding/telemetry
         - claude-desktop-unofficial
+        - samba-client
+        - gvfs-smb # Nautilus "Connect to Server..." SMB/CIFS support
