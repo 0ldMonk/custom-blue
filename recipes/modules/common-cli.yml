@@ -42,6 +42,7 @@ modules:
         - fping
         - expect
         - axel
+        - wget
         - smartmontools
         - iftop
         - nmon
