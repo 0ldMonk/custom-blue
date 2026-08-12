@@ -49,6 +49,7 @@ modules:
         - pamu2fcfg
         - fido2-tools
         - kitty
+        - steam
 
   - type: default-flatpaks
     configurations:
