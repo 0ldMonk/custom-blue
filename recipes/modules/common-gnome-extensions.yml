@@ -18,6 +18,10 @@ modules:
       - 3193  # Blur my Shell
       - 10046 # Custom Touchpad Gestures
   - type: dnf
+    repos:
+      copr:
+        - lizardbyte/stable # official sunshine (Moonlight host) repo
     install:
       packages:
         - gnome-tweaks
+        - sunshine
