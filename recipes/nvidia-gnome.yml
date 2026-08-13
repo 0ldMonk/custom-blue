@@ -4,7 +4,7 @@ name: monk-blue-nvidia-gnome
 description: This is my personal OS image (GNOME + nvidia-hybrid — shared by the laptop (AMD iGPU) and the desktop (Intel iGPU)).
 
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: latest
+image-version: "44"
 
 modules:
   # MUST run first, against the pristine base image: the akmods nvidia install
