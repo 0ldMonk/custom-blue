@@ -1,48 +1,49 @@
 # Deploying `monk-blue-vm` on Proxmox
 
-`monk-blue-vm` is a bootc/ostree image, not a ready-made cloud disk image —
-it has to be converted to a qcow2 before Proxmox can use it, then set up
-once as a template so new VMs can be cloned from it.
+`monk-blue-vm` is a bootc/ostree image, but a ready-to-boot qcow2 is built
+from it automatically — download that, then set it up once as a Proxmox
+template so new VMs can be cloned from it.
 
-## 1. Build a qcow2 from the published image
+## 1. Download the qcow2
 
-On any Linux box with podman (doesn't have to be the Proxmox host):
+The [`disk-images`](.github/workflows/disk-images.yml) workflow rebuilds it
+every ~3 days from `monk-blue-vm:latest` and publishes it to the rolling
+[`images-latest`](../../releases/tag/images-latest) release. It's over
+GitHub's 2 GiB per-asset cap, so it ships split into `.partNN` pieces with
+one `.md5` covering the reassembled file:
 
 ```bash
-mkdir -p ./output
-sudo podman run --rm -it --privileged --pull=newer \
-  --security-opt label=type:unconfined_t \
-  -v ./output:/output \
-  -v /var/lib/containers/storage:/var/lib/containers/storage \
-  quay.io/centos-bootc/bootc-image-builder:latest \
-  --type qcow2 \
-  --rootfs ext4 \
-  ghcr.io/0ldmonk/monk-blue-vm:latest
+gh release download images-latest --repo 0ldmonk/custom-blue \
+  --pattern 'monk-blue-vm.qcow2*'
+cat monk-blue-vm.qcow2.part* > monk-blue-vm.qcow2
+md5sum -c monk-blue-vm.qcow2.md5
+rm monk-blue-vm.qcow2.part*
 ```
 
-Output lands at `./output/qcow2/disk.qcow2`. The image is public, so no
-registry auth is needed.
+The release is public — no `gh auth`/registry login needed; the assets can
+equally be downloaded from the release page in a browser. No decompression
+step: unlike the ISOs, the qcow2 is not xz'd.
 
-`--rootfs ext4` is explicit on purpose: `quay.io/fedora/fedora-bootc` doesn't
-declare a root filesystem type in its own image config, and
-`bootc-image-builder`'s undeclared fallback isn't reliably pinned down —
-rather than depend on that, force ext4 directly (confirmed as a real,
-supported flag in `bootc-image-builder`'s source,
-`bib/cmd/bootc-image-builder/main.go`).
+Nothing machine-specific is baked in. `bootc-image-builder` has its own
+mechanism (a `config.toml`) for creating a default user at build time and
+the workflow deliberately doesn't use it — the recipe installs `cloud-init`
+into the image instead, so Proxmox's Cloud-Init drive (step 3) handles the
+`pi` user/SSH key at each VM's first boot, same as the rest of the homelab.
 
-Note: `bootc-image-builder` has its own separate mechanism (a `config.toml`
-mounted at `/config.toml`) for baking in a default user at *this* step —
-don't use it. The recipe already installs `cloud-init` into the image
-itself, so Proxmox's own Cloud-Init drive (step 3) handles the `pi`
-user/SSH key at each VM's first boot, same as the rest of the homelab.
+To build one locally instead (custom root size, or a tag other than
+`latest`), copy the podman invocation out of `.github/workflows/disk-images.yml`
+— it carries the non-obvious flags (`--rootfs ext4` because
+`quay.io/fedora/fedora-bootc` declares no root filesystem type, and the
+`minsize` config without which the root partition is too small to boot).
 
 ## 2. Import the qcow2 into Proxmox
 
-Copy `disk.qcow2` to the Proxmox node, then:
+Copy `monk-blue-vm.qcow2` to the Proxmox node (or just run step 1 there),
+then:
 
 ```bash
 qm create 9000 --name monk-blue-vm-template --memory 2048 --net0 virtio,bridge=vmbr0
-qm importdisk 9000 disk.qcow2 <your-storage-name>
+qm importdisk 9000 monk-blue-vm.qcow2 <your-storage-name>
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 <your-storage-name>:vm-9000-disk-0
 qm set 9000 --boot order=scsi0
 ```
@@ -81,9 +82,9 @@ independently in its own Cloud-Init tab.
 
 ## 5. Growing the disk
 
-`bootc-image-builder` sizes the root filesystem at its configured minimum
-(or 2x the container image size, whichever is larger) — **not** whatever
-size you resize the Proxmox virtual disk to. The root volume is LVM
+The published qcow2's root filesystem is 15 GiB (the `minsize` the workflow
+passes to `bootc-image-builder`) — **not** whatever size you resize the
+Proxmox virtual disk to. The root volume is LVM
 (PV -> VG -> LV), and cloud-init's `growpart` module does not grow logical
 volumes, only partitions — so `qm resize` alone does not get you more
 usable space. Full chain, after `qm resize <vmid> scsi0 +20G`:
