@@ -1,0 +1,11 @@
+[45drives_enterprise]
+name=45Drives Enterprise
+# el9, not $releasever: 45Drives builds nothing for Fedora, el44 is a 404; el9 noarch installs fine on f44
+baseurl=https://repo.45drives.com/enterprise/rocky/el9/stable
+# repo also carries EL9 cockpit/samba/zfs/smartmontools older than Fedora's, and upstream sets priority=1 (beats version) — scope it to the two packages Fedora lacks
+includepkgs=cockpit-file-sharing cockpit-identities
+enabled=1
+gpgcheck=1
+# repo_gpgcheck=1 (upstream's default) breaks the build: dnf5 won't accept an rpm --import'ed key for repomd and prompts interactively
+repo_gpgcheck=0
+gpgkey=https://repo.45drives.com/key/gpg.asc
