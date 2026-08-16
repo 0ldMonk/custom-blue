@@ -31,11 +31,11 @@ modules:
         - nfs-utils
         - snapper
         - borgmatic
-        # no Fedora package or live COPR exists (checked 2026-08)
-        - repo: 45drives_enterprise
-          packages:
-            - cockpit-file-sharing
-            - cockpit-identities
+        # no Fedora package or live COPR exists (checked 2026-08). Plain names, not
+        # `repo:` — that runs a repo-restricted transaction that can't see Fedora's
+        # perl; includepkgs in 45drives.repo already pins where these two come from.
+        - cockpit-file-sharing
+        - cockpit-identities
 
   # Nested-VM management via cockpit-machines/libvirt/qemu.
   - type: dnf
