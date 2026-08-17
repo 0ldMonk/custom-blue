@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-type: fonts
-fonts:
-  nerd-fonts:
-    - JetBrainsMono
+# The `fonts` module can't filter variants — 229 MB for JetBrainsMono alone.
+type: script
+scripts:
+  - nerd-fonts.sh
