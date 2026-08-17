@@ -38,5 +38,6 @@ jobs:
           pr_event_number: ${{ github.event.number }}
 
           maximize_build_space: true
-          chunkah: true
+          # Mutually exclusive with chunkah, whose chunks never dedup (build mtimes).
+          build_chunked_oci: true
           use_cache: true
