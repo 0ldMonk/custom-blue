@@ -1,0 +1,8 @@
+[nvidia-container-toolkit]
+name=NVIDIA Container Toolkit
+baseurl=https://nvidia.github.io/libnvidia-container/stable/rpm/$basearch
+enabled=1
+# NVIDIA ships these RPMs unsigned, so upstream leans on repo_gpgcheck instead — but that
+# hangs the dnf5 build on a key prompt (same as 45drives.repo). Both off; trust is TLS only.
+gpgcheck=0
+repo_gpgcheck=0

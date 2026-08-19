@@ -21,3 +21,18 @@ modules:
         - claude-desktop-unofficial
         - samba-client
         - gvfs-smb # Nautilus "Connect to Server..." SMB/CIFS support
+
+  # nvidia-container-toolkit is in no Fedora repo and no live COPR (checked 2026-08).
+  # docker-ce's own repo is already set up in common-cli.yml.
+  - type: dnf
+    repos:
+      files:
+        - nvidia-container-toolkit.repo # local file: files/dnf/nvidia-container-toolkit.repo
+    install:
+      packages:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+        - nvidia-container-toolkit
