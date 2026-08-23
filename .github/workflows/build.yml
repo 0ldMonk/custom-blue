@@ -38,8 +38,5 @@ jobs:
           pr_event_number: ${{ github.event.number }}
 
           maximize_build_space: true
-          # Mutually exclusive with chunkah, whose chunks never dedup (build mtimes).
-          build_chunked_oci: true
-          # Name-keyed baseline plan orphans multilib (i686) content -> rpm-ostree panic.
-          rechunk_clear_plan: true
+          chunkah: true
           use_cache: true
