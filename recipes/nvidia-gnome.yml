@@ -49,8 +49,3 @@ modules:
         - pamu2fcfg
         - fido2-tools
         - kitty
-
-  - type: default-flatpaks
-    configurations:
-      - scope: system
-        install: []
