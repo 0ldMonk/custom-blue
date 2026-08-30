@@ -39,4 +39,5 @@ jobs:
 
           maximize_build_space: true
           build_chunked_oci: true
+          max_layers: 256
           use_cache: true
