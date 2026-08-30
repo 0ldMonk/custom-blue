@@ -33,6 +33,11 @@ modules:
 
   - type: kargs
     kargs:
+      # fedora-bootc ships no auditd at all, so the kernel printk's every
+      # systemd unit start/stop to both consoles and the persistent journal.
+      # SELinux AVC denials are generated regardless of this and still land
+      # in the journal.
+      - audit=0
       # both consoles registered so early boot output (incl. the dracut LUKS
       # passphrase prompt) reaches either Proxmox console tab; a single
       # console= only registers that one device, leaving the other blank.
