@@ -55,6 +55,14 @@ jobs:
           set -euo pipefail
           mkdir -p output
           sudo podman pull "$IMAGE" # :latest is anonymously pullable, no login
+
+          # --- ADD THIS SQUASH BLOCK TO FIX MAX DEPTH ---
+          echo "Squashing image to 1 layer to avoid max depth limit..."
+          sudo buildah from --name tmp-container "$IMAGE"
+          sudo buildah commit --squash tmp-container "$IMAGE"
+          sudo buildah rm tmp-container
+          # ----------------------------------------------
+          
           # Empty kickstart -> fully interactive Anaconda: the installer picks
           # partitioning/filesystem/LUKS and creates the user (no baked creds).
           printf '[customizations.installer.kickstart]\ncontents = ""\n' > iso.toml
