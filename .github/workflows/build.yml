@@ -39,5 +39,5 @@ jobs:
 
           maximize_build_space: true
           chunkah: true
-          max_layers: 512
+          max_layers: 256
           use_cache: true
