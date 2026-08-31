@@ -40,6 +40,8 @@ jobs:
             types: anaconda-iso
           - image: monk-blue-vm
             types: anaconda-iso qcow2
+          - image: monk-blue-nvidia-niri
+            types: anaconda-iso
     env:
       IMAGE: ghcr.io/0ldmonk/${{ matrix.image }}:latest
     steps:
