@@ -23,6 +23,7 @@ modules:
         - wireguard-tools
         - autofs
         - moreutils
+        - usbutils
         - nodejs
         - borgbackup
         - rclone
