@@ -37,12 +37,11 @@ modules:
         - cockpit-file-sharing
         - cockpit-identities
 
-  # Nested-VM management via cockpit-machines/libvirt/qemu.
-  - type: dnf
-    install:
-      packages:
-        - cockpit-machines
-        - libvirt
-        - qemu-kvm
-
   - type: signing
+
+  # BlueBuild's own build tooling. cosign included — bootc verifies via
+  # containers/image, not that binary. Must stay LAST: modules exec through nu.
+  - type: script
+    snippets:
+      - "rm -f /usr/bin/cosign /usr/bin/bluebuild"
+      - "rm -rf /usr/libexec/bluebuild"

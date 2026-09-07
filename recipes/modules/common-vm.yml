@@ -24,7 +24,6 @@ modules:
         - autofs
         - moreutils
         - usbutils
-        - nodejs
         - borgbackup
         - rclone
         - google-authenticator # SSH OTP capability, baked in but inert until
@@ -85,7 +84,21 @@ modules:
       masked:
         - bootc-fetch-apply-updates.timer
 
+  # intel-gpu-firmware and linux-firmware-whence are deliberately absent: pr1
+  # passes through an iGPU, and every subpackage requires whence.
   - type: dnf
     remove:
       packages:
         - linux-firmware
+        - nvidia-gpu-firmware
+        - amd-gpu-firmware
+        - amd-ucode-firmware
+        - atheros-firmware
+        - brcmfmac-firmware
+        - cirrus-audio-firmware
+        - intel-audio-firmware
+        - mt7xxx-firmware
+        - nxpwireless-firmware
+        - qcom-wwan-firmware
+        - realtek-firmware
+        - tiwilink-firmware
