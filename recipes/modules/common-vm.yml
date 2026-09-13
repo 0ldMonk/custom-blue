@@ -20,6 +20,10 @@ modules:
         - qemu-guest-agent
         - node-exporter
         - cronie
+        # binary only in fedora-bootc; zram-generator-defaults (the config that
+        # actually creates a device) is absent, so the device comes from
+        # files/vm/usr/lib/systemd/zram-generator.conf instead
+        - zram-generator
         - wireguard-tools
         - autofs
         - moreutils
