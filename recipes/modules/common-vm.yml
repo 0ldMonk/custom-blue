@@ -30,6 +30,7 @@ modules:
         - usbutils
         - borgbackup
         - rclone
+        - hdparm
         - google-authenticator # SSH OTP capability, baked in but inert until
                                 # `enable-ssh-otp` is run manually per-VM
 
