@@ -49,3 +49,35 @@ modules:
         - pamu2fcfg
         - fido2-tools
         - kitty
+
+  # nvidia's upstream repo file works as-is: its own gpgkey= URL satisfies
+  # repo_gpgcheck=1, unlike 45drives'. docker-ce's repo comes from common-cli.yml.
+  - type: dnf
+    repos:
+      keys:
+        - "https://nvidia.github.io/libnvidia-container/gpgkey"
+      files:
+        - "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
+    install:
+      packages:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+        - nvidia-container-toolkit
+
+  - type: files
+    files:
+      - source: gnome
+        destination: /
+
+  # nvidia-container-toolkit ships a preset enabling the cdi-refresh units, but
+  # presets don't fire reliably in a bootc build.
+  - type: systemd
+    system:
+      enabled:
+        - docker.service
+        - docker.socket
+        - nvidia-cdi-refresh.path
+        - nvidia-cdi-refresh.service
