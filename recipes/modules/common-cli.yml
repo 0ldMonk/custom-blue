@@ -46,6 +46,7 @@ modules:
         - smartmontools
         - hd-idle 
         - iftop
+        - iotop
         - nmon
         - nvtop
         - compsize
