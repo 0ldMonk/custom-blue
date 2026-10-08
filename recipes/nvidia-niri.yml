@@ -58,15 +58,10 @@ modules:
       - rcutree.enable_rcu_lazy=1
 
   - type: dnf
-    repos:
-      copr:
-        - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
-        - itotm/cachyos-kernel-znver4 # used to overlay cachy-os kernel if needed
     # Unlike nvidia-gnome (ships in silverblue-main), base-main has no path
     # that drags tuned-ppd in for niri, so it needs an explicit install here.
     install:
       packages:
-        - ananicy-cpp
         - pam-u2f
         - pamu2fcfg
         - fido2-tools

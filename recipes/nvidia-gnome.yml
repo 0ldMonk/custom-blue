@@ -35,16 +35,11 @@ modules:
       - rcutree.enable_rcu_lazy=1
 
   - type: dnf
-    repos:
-      copr:
-        - bieszczaders/kernel-cachyos-addons # provides ananicy-cpp
-        - itotm/cachyos-kernel-znver4 # laptop-only: overlay cachy-os kernel live if needed
     # Keep the base's tuned-ppd (Fedora's default ppd-service provider since
     # F41) instead of swapping in power-profiles-daemon — matches nvidia-niri,
     # which installs tuned-ppd explicitly, so the fleet runs one power backend.
     install:
       packages:
-        - ananicy-cpp
         - pam-u2f
         - pamu2fcfg
         - fido2-tools
