@@ -65,3 +65,7 @@ modules:
         - pamu2fcfg
         - fido2-tools
         - tuned-ppd
+        # Thunderbolt device authorization (silverblue-main ships it, base-main
+        # doesn't) — without it a TB dock stays authorized=0: display works via
+        # DP tunnel, but its USB ports sit behind the unapproved PCIe tunnel.
+        - bolt
