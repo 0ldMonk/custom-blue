@@ -9,38 +9,32 @@ image-version: "45"
 modules:
   - from-file: modules/common-vm.yml
 
-  # NAS tooling, folded in from the former nas.yml. No systemd module on purpose:
-  # fedora-bootc:44 carries no preset for cockpit/smb/nfs-server (verified
-  # in-image), so `disable *` leaves them off until enabled per-machine — a
-  # plain VM ships these packages but runs none of them.
+  # no systemd module on purpose: no preset enables cockpit/smb/nfs-server, so they stay off
   - type: dnf
     repos:
       copr:
-        - gotmax23/mergerfs # mergerfs isn't packaged in Fedora at all
+        - gotmax23/mergerfs
       keys:
         - https://repo.45drives.com/key/gpg.asc
       files:
-        - 45drives.repo # local file: files/dnf/45drives.repo
+        - 45drives.repo
     install:
       packages:
         - mergerfs
         - snapraid
         - cockpit
         - cockpit-storaged
-        - samba # file-sharing RPM pulls only samba-common-tools; smbd needs this
+        - samba # cockpit-file-sharing doesn't pull smbd
         - nfs-utils
         - snapper
         - borgmatic
-        # no Fedora package or live COPR exists (checked 2026-08). Plain names, not
-        # `repo:` — that runs a repo-restricted transaction that can't see Fedora's
-        # perl; includepkgs in 45drives.repo already pins where these two come from.
+        # plain names, not `repo:` (repo-restricted, can't see Fedora's perl); includepkgs pins the source
         - cockpit-file-sharing
         - cockpit-identities
 
   - type: signing
 
-  # BlueBuild's own build tooling. cosign included — bootc verifies via
-  # containers/image, not that binary. Must stay LAST: modules exec through nu.
+  # must stay LAST (modules exec through nu); bootc doesn't need the cosign binary
   - type: script
     snippets:
       - "rm -f /usr/bin/cosign /usr/bin/bluebuild"

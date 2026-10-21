@@ -1,8 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# two separate dnf transactions: firefox-langpacks hard-pins firefox's exact
-# EVR, which the solver can't satisfy if the removal and the
-# differently-versioned Mozilla install are resolved together.
+# two transactions: firefox-langpacks pins Fedora firefox's exact EVR
 modules:
   - type: dnf
     remove:
@@ -14,9 +12,9 @@ modules:
       keys:
         - "https://packages.mozilla.org/rpm/firefox/signing-key.gpg"
       files:
-        - "mozilla-firefox.repo" # local file: files/dnf/mozilla-firefox.repo
+        - "mozilla-firefox.repo"
     install:
       packages:
-        - repo: mozilla-firefox # explicitly source from Mozilla, not Fedora
+        - repo: mozilla-firefox
           packages:
             - firefox

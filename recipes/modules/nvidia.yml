@@ -1,11 +1,5 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# installs the driver only (kmod + userspace libs, incl. libcuda/libnvidia-ml
-# runtime driver API) — does NOT pull the CUDA toolkit (nvcc/cuda-runtime);
-# add `cuda` packages explicitly if you need to build/run the full toolkit.
-# the akmods module also auto-adds nouveau/modeset/simpledrm kargs; the
-# nouveau blacklist below is redundant with that but kept explicit so this
-# file fully describes the nvidia karg set.
 modules:
   - type: akmods
     install: []

@@ -1,8 +1,6 @@
 name: disk-images
 on:
   schedule:
-    # every ~3rd day, after the 06:00 image build. */3 gives a shorter gap at
-    # month boundaries — fine for a rolling artifact.
     - cron: "00 08 */3 * *"
   workflow_dispatch:
 concurrency:
@@ -30,7 +28,7 @@ jobs:
     name: ${{ matrix.image }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write # upload to the rolling release
+      contents: write
       packages: read
     strategy:
       fail-fast: false
@@ -56,24 +54,20 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p output
-          sudo podman pull "$IMAGE" # :latest is anonymously pullable, no login
+          sudo podman pull "$IMAGE"
 
-          # --- ADD THIS SQUASH BLOCK TO FIX MAX DEPTH ---
           echo "Squashing image to 1 layer to avoid max depth limit..."
           sudo buildah from --name tmp-container "$IMAGE"
           sudo buildah commit --squash tmp-container "$IMAGE"
           sudo buildah rm tmp-container
-          # ----------------------------------------------
-          
-          # Empty kickstart -> fully interactive Anaconda: the installer picks
-          # partitioning/filesystem/LUKS and creates the user (no baked creds).
+
+          # empty kickstart = fully interactive Anaconda, no baked creds
           printf '[customizations.installer.kickstart]\ncontents = ""\n' > iso.toml
           # qcow2's default root partition is too small to boot; size it up.
           printf '[[customizations.filesystem]]\nmountpoint = "/"\nminsize = "15 GiB"\n' > qcow2.toml
           # BIB refuses to mix ISO and disk types in one run — invoke it per type.
           for t in ${{ matrix.types }}; do
-            # BIB requires --rootfs to build the manifest even for the ISO (neither
-            # base image declares a default); the interactive installer overrides it.
+            # BIB needs --rootfs even for the ISO; the installer overrides it
             args=(--type "$t" --rootfs ext4)
             case "$t" in
               qcow2) cfg=qcow2.toml ;;
@@ -91,13 +85,12 @@ jobs:
       - name: Publish to rolling release
         run: |
           set -euo pipefail
-          sudo chown -R "$(id -u):$(id -g)" output # BIB writes output/ as root
+          sudo chown -R "$(id -u):$(id -g)" output
 
-          publish() { # md5 the artifact, split if over the 2 GiB cap, then upload
+          publish() {
             local f="$1"
             md5sum "$f" > "$f.md5"
-            # part count varies run-to-run, and --clobber only overwrites matching
-            # names — so drop this artifact's old assets first to avoid stale parts.
+            # part count varies, so delete old parts first or stale ones linger
             gh release view "$TAG" --json assets -q '.assets[].name' \
               | grep -E "^$f(\.md5|\.part[0-9]+)?$" \
               | while read -r a; do gh release delete-asset "$TAG" "$a" -y; done || true

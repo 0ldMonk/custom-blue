@@ -1,7 +1,5 @@
 #!/bin/bash
 # Read-only: reports what's in place and prints the remaining commands to run.
-# Nothing here is bakeable — ip= is per-machine, and the key stays out of a
-# public image.
 set -euo pipefail
 
 CONF=/etc/dracut.conf.d/zz-crypt-ssh-local.conf

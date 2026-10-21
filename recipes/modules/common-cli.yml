@@ -14,9 +14,7 @@ modules:
     remove:
       packages:
         - nano-default-editor # conflicts with vim-default-editor
-        - vim-minimal # owns /usr/bin/vi; drop it so the vi->vim symlink below
-                      # (script module) owns that path cleanly instead of
-                      # shadowing an RPM-owned file
+        - vim-minimal # owns /usr/bin/vi, replaced by the symlink below
     install:
       packages:
         - micro
@@ -51,30 +49,14 @@ modules:
         - nvtop
         - compsize
 
-  # ostree never overwrites already-existing local /etc content on upgrade,
-  # so this only affects NEW accounts (and root, which already exists in the
-  # base image) — not already-deployed desktop accounts, which were
-  # switched to zsh live via `chsh`.
   - type: script
     snippets:
       - "sed -i 's|^SHELL=.*|SHELL=/usr/bin/zsh|' /etc/default/useradd"
-      - "usermod --shell /usr/bin/zsh root" # chsh (util-linux) is missing from
-                                             # the base image; usermod (shadow-utils) does the same job
-
-      # `vi` (/usr/bin/vi) comes from vim-minimal; point it at the vim-enhanced
-      # binary so `vi` == full vim everywhere (scripts/sudo too, not just an
-      # interactive shell alias). Relative target resolves within /usr/bin.
+      - "usermod --shell /usr/bin/zsh root" # chsh is missing from the base image
       - "ln -sf vim /usr/bin/vi"
-
-      # /etc/zshrc (shipped by the zsh package) is sourced by every interactive
-      # zsh shell regardless of whether a per-user ~/.zshrc exists, so this
-      # reaches root and any account created later (e.g. the VM's cloud-init
-      # pi user) without depending on /etc/skel or home-dir timing.
       - "echo 'source /etc/zsh-custom-config/zsh-extra.zsh' >> /etc/zshrc"
 
-  # Inert where brew isn't installed — see the unit's ConditionPathIsSymbolicLink.
-  # Name is deliberately not brew-upgrade.*: that's what BlueBuild's own brew
-  # module installs, and one would silently overwrite the other if it came back.
+  # not named brew-upgrade.*: BlueBuild's brew module would overwrite it
   - type: systemd
     system:
       enabled:

@@ -1,9 +1,5 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# niri + dms (Dank Material Shell) — the desktop stack for nvidia-niri.
-# niri itself is official Fedora (43+), no COPR needed; quickshell/dgop and
-# dms/dms-cli come from avengemedia's own COPRs (danklinux + dms) so there's
-# only one upstream party behind the non-Fedora packages.
 modules:
   - type: dnf
     repos:
@@ -17,8 +13,8 @@ modules:
         - dgop
         - dms
         - dms-cli
-        - cava             # audio visualizer widget
-        - matugen           # wallpaper-based theming
-        - qt6-qtmultimedia  # media-widget album art
-        - brightnessctl     # niri keybind shells out to this for brightness keys
-        - nautilus          # file manager; matches dms's own default keybind, light deps (no gnome-shell)
+        - cava
+        - matugen
+        - qt6-qtmultimedia
+        - brightnessctl
+        - nautilus

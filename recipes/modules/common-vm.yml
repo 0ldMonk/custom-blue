@@ -2,9 +2,6 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
 modules:
   - from-file: modules/common-files.yml
-
-  # NOT common-packages.yml — that has desktop-only packages (gnome-tweaks,
-  # codium) that don't belong on a headless VM
   - from-file: modules/common-cli.yml
 
   - type: dnf
@@ -15,14 +12,10 @@ modules:
         - containerd.io
         - docker-buildx-plugin
         - docker-compose-plugin
-        - cloud-init # consumes Proxmox's Cloud-Init drive: network, hostname,
-                      # and the pi user + its SSH key (Proxmox ciuser/sshkeys)
+        - cloud-init
         - qemu-guest-agent
         - node-exporter
         - cronie
-        # binary only in fedora-bootc; zram-generator-defaults (the config that
-        # actually creates a device) is absent, so the device comes from
-        # files/vm/usr/lib/systemd/zram-generator.conf instead
         - zram-generator
         - wireguard-tools
         - autofs
@@ -31,48 +24,30 @@ modules:
         - borgbackup
         - rclone
         - hdparm
-        - google-authenticator # SSH OTP capability, baked in but inert until
-                                # `enable-ssh-otp` is run manually per-VM
+        - google-authenticator
 
   - from-file: modules/common-initrd-unlock.yml
 
   - type: kargs
     kargs:
-      # fedora-bootc ships no auditd at all, so the kernel printk's every
-      # systemd unit start/stop to both consoles and the persistent journal.
-      # SELinux AVC denials are generated regardless of this and still land
-      # in the journal.
+      # no auditd here, so the kernel otherwise prints every unit start/stop to console + journal
       - audit=0
-      # both consoles registered so early boot output (incl. the dracut LUKS
-      # passphrase prompt) reaches either Proxmox console tab; a single
-      # console= only registers that one device, leaving the other blank.
-      # tty0 listed first, ttyS0 last so ttyS0 stays the primary /dev/console
-      # (unchanged from before).
+      # both, so the LUKS prompt reaches either Proxmox console; last (ttyS0) is /dev/console
       - console=tty0
-      - console=ttyS0 # serial console, for Proxmox's noVNC/xterm.js console
+      - console=ttyS0
 
-  # the pi USER ITSELF and its SSH key are deliberately NOT baked here — both
-  # come from Proxmox's Cloud-Init (ciuser=pi + SSH public key set per
-  # VM/template), so no key or user-creation logic is committed to this repo.
   - type: files
     files:
       - source: vm
         destination: /
 
-  # git doesn't preserve arbitrary file modes, and the files module's plain
-  # `cp` doesn't either — so /etc/sudoers.d/pi lands at a mode sudo rejects
-  # (sudo requires exactly 0440; 0644 is explicitly refused), and the
-  # reboot-required script needs its executable bit set explicitly too.
+  # the files module doesn't preserve modes; sudo refuses anything but 0440
   - type: script
     snippets:
       - "chmod 0440 /etc/sudoers.d/pi"
       - "chmod 0755 /usr/libexec/rpm-ostree-reboot-required"
       - "chmod 0755 /usr/bin/enable-ssh-otp"
 
-  # node-exporter and the reboot-required timer both auto-start on boot here
-  # (unlike node-exporter's package-only precedent elsewhere) since the
-  # reboot-required metric this VM cares about is meaningless without the
-  # exporter actually running, and there's no separate Ansible step for it.
   - type: systemd
     system:
       enabled:
@@ -81,16 +56,11 @@ modules:
         - node_exporter.service
         - rpm-ostree-reboot-required.timer
         - rpm-ostreed-automatic.timer
-      # bootc's own auto-updater: fetches AND applies/reboots on its own
-      # schedule, ignoring rpm-ostreed.conf's AutomaticUpdatePolicy=stage
-      # above. Masked (not just disabled) so it can't come back via a future
-      # preset/package update — updates here are stage-only, reboot is a
-      # separate, deliberate Ansible-driven step.
+      # reboots on its own, ignoring AutomaticUpdatePolicy=stage; reboots are Ansible's
       masked:
         - bootc-fetch-apply-updates.timer
 
-  # intel-gpu-firmware and linux-firmware-whence are deliberately absent: pr1
-  # passes through an iGPU, and every subpackage requires whence.
+  # intel-gpu-firmware + linux-firmware-whence deliberately kept: pr1 passes through an iGPU
   - type: dnf
     remove:
       packages:

@@ -24,7 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         recipe:
-          # !! Add your recipes here
           - nvidia-gnome.yml
           - nvidia-niri.yml
           - virtual-machine.yml

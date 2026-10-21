@@ -1,8 +1,5 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-list-v1.json
-# GNOME-only bits: shell extensions + gnome-tweaks. Included only by the GNOME
-# recipe (nvidia-gnome) — gnome-tweaks lives here, not in common-packages.yml,
-# so the DE-agnostic niri image (nvidia-niri) doesn't drag it in.
 modules:
   - type: gnome-extensions
     install:
@@ -20,7 +17,7 @@ modules:
   - type: dnf
     repos:
       copr:
-        - lizardbyte/stable # official sunshine (Moonlight host) repo
+        - lizardbyte/stable # official sunshine repo
     install:
       packages:
         - gnome-tweaks

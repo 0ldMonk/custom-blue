@@ -1,7 +1,6 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/module-v1.json
-# Remote LUKS unlock. Inert on every image: dropbear only reaches the initrd
-# via local regeneration, which `enable-initrd-unlock` walks through per machine.
+# inert until `enable-initrd-unlock`: dropbear only reaches the initrd via local regen
 modules:
   - type: dnf
     repos:

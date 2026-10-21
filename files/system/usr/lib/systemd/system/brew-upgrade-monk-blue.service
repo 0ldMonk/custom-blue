@@ -11,9 +11,7 @@ User=1000
 Environment=HOMEBREW_PREFIX=/home/linuxbrew/.linuxbrew
 Environment=HOMEBREW_CELLAR=/home/linuxbrew/.linuxbrew/Cellar
 Environment=HOMEBREW_REPOSITORY=/home/linuxbrew/.linuxbrew/Homebrew
-# bash -c is load-bearing, not style: systemd execs as init_t, and SELinux denies
-# it even reading a user_home_t symlink (203/EXEC). Exec'ing shell_exec_t instead
-# and letting bash reach brew is what upstream did and what works.
+# bash -c is load-bearing: SELinux denies init_t exec of the user_home_t symlink (203/EXEC)
 ExecStart=/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew update"
 ExecStart=/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew upgrade"
 ExecStart=/usr/bin/bash -c "/home/linuxbrew/.linuxbrew/bin/brew cleanup --prune=5"

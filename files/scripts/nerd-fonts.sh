@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -oue pipefail
 
-# Replaces the `fonts` module, which has no variant filter: all 96 TTFs, 229 MB.
-# The .tar.xz is only 6 MB because xz dedups across the near-identical files;
-# OCI layer gzip (32 KB window) can't, so the image pays the full 229 MB.
+# Replaces the `fonts` module, which can't filter variants (all 96 TTFs = 229 MB in the image).
 
 FONT=JetBrainsMono
 DEST="/usr/share/fonts/nerd-fonts/${FONT}"

@@ -1,10 +1,5 @@
 #!/bin/bash
-# Read-only helper: checks whether SSH OTP is already active and, if not,
-# prints the exact manual steps to enable it. Deliberately does NOT edit
-# any file itself. Both baked config files ship fully commented out;
-# turning OTP on for real is mandatory-with-no-fallback and can lock an
-# account out of SSH, so that edit is safer done by hand than by a script
-# pattern-matching text that could silently drift out of sync over time.
+# Read-only on purpose: a wrong automated edit here locks accounts out of SSH.
 set -euo pipefail
 
 PAM_FILE=/etc/pam.d/sshd

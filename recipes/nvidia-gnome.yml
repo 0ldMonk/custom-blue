@@ -7,9 +7,7 @@ base-image: ghcr.io/ublue-os/silverblue-main
 image-version: "45"
 
 modules:
-  # MUST run first, against the pristine base image: the akmods nvidia install
-  # pulls 32-bit (i686) mesa, and if a prior dnf module (rpmfusion/firefox) has
-  # already bumped the x86_64 mesa stack, the lagging i686 mesa conflicts.
+  # must stay FIRST: akmods' i686 mesa conflicts with any earlier x86_64 mesa bump
   - from-file: modules/nvidia.yml
 
   - from-file: modules/common-files.yml
@@ -21,10 +19,6 @@ modules:
   - from-file: modules/common-flatpaks.yml
   - type: signing
 
-  # Both machines are iGPU-display + nvidia-compute hybrids (laptop: AMD iGPU,
-  # desktop: Intel iGPU). /etc/environment pins EGL to mesa so the GNOME session
-  # renders on the iGPU, leaving nvidia free for compute (llama-server / local
-  # LLM). The files/nvidia-hybrid/ dir is shared with nvidia-niri.
   - type: files
     files:
       - source: nvidia-hybrid
@@ -35,9 +29,6 @@ modules:
       - rcutree.enable_rcu_lazy=1
 
   - type: dnf
-    # Keep the base's tuned-ppd (Fedora's default ppd-service provider since
-    # F41) instead of swapping in power-profiles-daemon — matches nvidia-niri,
-    # which installs tuned-ppd explicitly, so the fleet runs one power backend.
     install:
       packages:
         - pam-u2f
@@ -45,8 +36,7 @@ modules:
         - fido2-tools
         - kitty
 
-  # nvidia's upstream repo file works as-is: its own gpgkey= URL satisfies
-  # repo_gpgcheck=1, unlike 45drives'. docker-ce's repo comes from common-cli.yml.
+  # docker-ce's repo comes from common-cli.yml
   - type: dnf
     repos:
       keys:
@@ -67,8 +57,7 @@ modules:
       - source: gnome
         destination: /
 
-  # nvidia-container-toolkit ships a preset enabling the cdi-refresh units, but
-  # presets don't fire reliably in a bootc build.
+  # cdi-refresh's own preset doesn't fire reliably in a bootc build
   - type: systemd
     system:
       enabled:
