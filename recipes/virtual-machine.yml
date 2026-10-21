@@ -4,7 +4,7 @@ name: monk-blue-vm
 description: This is my personal OS image (headless Proxmox VM; NAS tooling included but inert until enabled per-machine).
 
 base-image: quay.io/fedora/fedora-bootc
-image-version: "44"
+image-version: "45"
 
 modules:
   - from-file: modules/common-vm.yml
