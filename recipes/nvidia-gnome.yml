@@ -36,13 +36,12 @@ modules:
         - fido2-tools
         - kitty
 
-  # docker-ce's repo comes from common-cli.yml
+  # docker-ce's repo comes from common-cli.yml; nvidia's ships disabled in
+  # ublue-os-nvidia-addons, and `repo:` enables it for that one install
   - type: dnf
     repos:
       keys:
         - "https://nvidia.github.io/libnvidia-container/gpgkey"
-      files:
-        - "https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo"
     install:
       packages:
         - docker-ce
@@ -50,7 +49,9 @@ modules:
         - containerd.io
         - docker-buildx-plugin
         - docker-compose-plugin
-        - nvidia-container-toolkit
+        - repo: nvidia-container-toolkit
+          packages:
+            - nvidia-container-toolkit
 
   - type: files
     files:
