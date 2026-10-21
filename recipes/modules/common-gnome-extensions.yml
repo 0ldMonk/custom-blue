@@ -11,9 +11,9 @@ modules:
       - 615   # AppIndicator and KStatusNotifierItem Support
      # - 9875  # O-tiling
       - 4998  # Legacy (GTK3) Theme Scheme Auto Switcher
-      - 1401  # Bluetooth Quick Connect
+     # - 1401  # Bluetooth Quick Connect — no GNOME 51 release yet
       - 3193  # Blur my Shell
-      - 10046 # Custom Touchpad Gestures
+     # - 10046 # Custom Touchpad Gestures — no GNOME 51 release yet
   - type: dnf
     repos:
       copr:
