@@ -7,10 +7,8 @@ modules:
     repos:
       keys:
         - "https://repo.vscodium.dev/vscodium.gpg"
-        - "https://pkg.claude-desktop-debian.dev/KEY.gpg"
       files:
         - "https://repo.vscodium.dev/vscodium.repo"
-        - "https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo"
       nonfree: rpmfusion
     install:
       packages:
@@ -18,6 +16,5 @@ modules:
         - s-tui
         - python3-amd-debug-tools
         - codium
-        - claude-desktop-unofficial
         - samba-client
         - gvfs-smb
