@@ -17,4 +17,4 @@ modules:
         - matugen
         - qt6-qtmultimedia
         - brightnessctl
-        - nautilus
+        - dux-files
