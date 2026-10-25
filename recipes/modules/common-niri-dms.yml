@@ -4,12 +4,12 @@ modules:
   - type: dnf
     repos:
       copr:
-        - avengemedia/danklinux # quickshell-git, dgop
+        - avengemedia/danklinux # quickshell, dgop
         - avengemedia/dms       # dms, dms-cli
     install:
       packages:
         - niri
-        - quickshell-git
+        - quickshell
         - dgop
         - dms
         - dms-cli
