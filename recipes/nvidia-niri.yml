@@ -58,3 +58,13 @@ modules:
         - fido2-tools
         - tuned-ppd
         - bolt
+
+  # libvirt units are socket-activated via Fedora's 90-default.preset, no systemd module needed
+  - type: dnf
+    install:
+      packages:
+        - virt-manager
+        - libvirt-daemon-kvm
+        - libvirt-daemon-config-network
+        - edk2-ovmf
+        - swtpm
