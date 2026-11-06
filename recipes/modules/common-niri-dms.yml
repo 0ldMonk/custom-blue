@@ -4,13 +4,13 @@ modules:
   - type: dnf
     repos:
       copr:
-        - avengemedia/danklinux # quickshell, dgop
-        - avengemedia/dms       # dms, dms-cli
+        - duxlabs/dux-repo
+        - duxlabs/dms
     install:
       packages:
         - niri
         - quickshell
-        - dgop
+        - dux-gop
         - dms
         - dms-cli
         - cava

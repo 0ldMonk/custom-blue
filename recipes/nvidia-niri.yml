@@ -18,15 +18,14 @@ modules:
   - from-file: modules/common-firefox.yml
   - type: signing
 
-  # dms-greeter: reuses the danklinux COPR, no new upstream party
   - type: dnf
     repos:
       copr:
-        - avengemedia/danklinux
+        - duxlabs/dux-repo
     install:
       packages:
         - greetd
-        - dms-greeter
+        - dux-greeter
         - kitty
   - type: files
     files:
