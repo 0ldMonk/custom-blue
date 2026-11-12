@@ -34,8 +34,9 @@ The `latest` tag will automatically point to the latest build. That build will s
 
 The [`disk-images`](.github/workflows/disk-images.yml) workflow runs every ~3 days
 (and on manual dispatch), building with
-[`bootc-image-builder`](https://github.com/osbuild/bootc-image-builder) from each
-image's `:latest` tag and publishing to a single rolling GitHub release tagged
+[`image-builder`](https://github.com/osbuild/image-builder) from each
+image's `:latest` tag (the ISOs from a custom Anaconda installer container in
+[`installer/`](installer/Containerfile)) and publishing to a single rolling GitHub release tagged
 [`images-latest`](../../releases/tag/images-latest) (assets overwritten each run):
 
 - `<image>-installer.iso.xz` — Anaconda **installer** ISO for every image

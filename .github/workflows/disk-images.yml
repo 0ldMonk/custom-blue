@@ -35,11 +35,11 @@ jobs:
       matrix:
         include:
           - image: monk-blue-nvidia-gnome
-            types: anaconda-iso
+            types: iso
           - image: monk-blue-vm
-            types: anaconda-iso qcow2
+            types: iso qcow2
           - image: monk-blue-nvidia-niri
-            types: anaconda-iso
+            types: iso
     env:
       IMAGE: ghcr.io/0ldmonk/${{ matrix.image }}:latest
     steps:
@@ -50,10 +50,12 @@ jobs:
           sudo docker image prune --all --force || true
           df -h /
 
-      - name: Build with bootc-image-builder
+      - uses: actions/checkout@v4
+
+      - name: Build with image-builder
         run: |
           set -euo pipefail
-          mkdir -p output
+          mkdir -p output/iso output/qcow2
           sudo podman pull "$IMAGE"
 
           echo "Squashing image to 1 layer to avoid max depth limit..."
@@ -61,25 +63,28 @@ jobs:
           sudo buildah commit --squash tmp-container "$IMAGE"
           sudo buildah rm tmp-container
 
-          # empty kickstart = fully interactive Anaconda, no baked creds
-          printf '[customizations.installer.kickstart]\ncontents = ""\n' > iso.toml
+          # BIB's anaconda-iso reads repos from the image's /etc/yum.repos.d, which Fedora 45 emptied,
+          # so the ISO is a generic-iso built from our own Anaconda installer container instead.
+          sudo podman build --build-arg IMAGE="$IMAGE" -t localhost/installer installer
+
           # qcow2's default root partition is too small to boot; size it up.
           printf '[[customizations.filesystem]]\nmountpoint = "/"\nminsize = "15 GiB"\n' > qcow2.toml
-          # BIB refuses to mix ISO and disk types in one run — invoke it per type.
-          for t in ${{ matrix.types }}; do
-            # BIB needs --rootfs even for the ISO; the installer overrides it
-            args=(--type "$t" --rootfs ext4)
-            case "$t" in
-              qcow2) cfg=qcow2.toml ;;
-              *) cfg=iso.toml ;;
-            esac
+
+          ib() {
             sudo podman run --rm --privileged \
               --security-opt label=type:unconfined_t \
               -v /var/lib/containers/storage:/var/lib/containers/storage \
               -v "$PWD/output:/output" \
-              -v "$PWD/$cfg:/config.toml:ro" \
-              quay.io/centos-bootc/bootc-image-builder:latest \
-              "${args[@]}" "$IMAGE"
+              -v "$PWD/qcow2.toml:/blueprint.toml:ro" \
+              ghcr.io/osbuild/image-builder-cli:latest build "$@"
+          }
+          for t in ${{ matrix.types }}; do
+            case "$t" in
+              iso) ib --output-dir /output/iso --bootc-ref localhost/installer \
+                     --bootc-installer-payload-ref "$IMAGE" --bootc-default-fs ext4 generic-iso ;;
+              qcow2) ib --output-dir /output/qcow2 --blueprint /blueprint.toml \
+                       --bootc-ref "$IMAGE" --bootc-default-fs ext4 qcow2 ;;
+            esac
           done
 
       - name: Publish to rolling release
@@ -102,9 +107,12 @@ jobs:
             fi
           }
 
-          xz -T0 -c output/bootiso/install.iso > "${{ matrix.image }}-installer.iso.xz"
+          # image-builder names outputs after distro/type/arch, so locate them instead
+          iso=$(find output/iso -name '*.iso' | head -n1)
+          xz -T0 -c "$iso" > "${{ matrix.image }}-installer.iso.xz"
           publish "${{ matrix.image }}-installer.iso.xz"
-          if [ -f output/qcow2/disk.qcow2 ]; then
-            mv output/qcow2/disk.qcow2 "${{ matrix.image }}.qcow2"
+          qcow2=$(find output/qcow2 -name '*.qcow2' | head -n1)
+          if [ -n "$qcow2" ]; then
+            mv "$qcow2" "${{ matrix.image }}.qcow2"
             publish "${{ matrix.image }}.qcow2"
           fi
